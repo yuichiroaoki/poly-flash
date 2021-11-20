@@ -1,0 +1,11 @@
+{
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown",
+    "overrides": {
+      "files": "*.sol",
+      "options": {
+        "tabWidth": 4
+      }
+    }
+  }
+}
