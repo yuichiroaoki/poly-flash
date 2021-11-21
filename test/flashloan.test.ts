@@ -38,11 +38,11 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.DAI],
-						router: uniswapRouter.quickRouter,
+						router: uniswapRouter.quickswap,
 					}],
 					secondRoutes: [{
 						path: [erc20Address.DAI, erc20Address.USDC],
-						router: uniswapRouter.quickRouter
+						router: uniswapRouter.quickswap
 					}],
 				})
 			).to.be.revertedWith("Not enough amount to return loan");
@@ -56,11 +56,11 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.DAI],
-						router: uniswapRouter.quickRouter
+						router: uniswapRouter.quickswap
 					}],
 					secondRoutes: [{
 						path: [erc20Address.DAI, erc20Address.USDC],
-						router: uniswapRouter.quickRouter
+						router: uniswapRouter.quickswap
 					}]
 				})
 			)
@@ -77,11 +77,11 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.DAI],
-						router: uniswapRouter.quickRouter
+						router: uniswapRouter.quickswap
 					}],
 					secondRoutes: [{
 						path: [erc20Address.DAI, erc20Address.USDC],
-						router: uniswapRouter.quickRouter
+						router: uniswapRouter.quickswap
 					}]
 				}, { gasLimit: 1000000 })
 			).to.be.revertedWith("Not enough amount to return loan");
@@ -95,11 +95,11 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.DAI],
-						router: uniswapRouter.quickRouter,
+						router: uniswapRouter.quickswap,
 					}],
 					secondRoutes: [{
 						path: [erc20Address.DAI, erc20Address.USDC],
-						router: uniswapRouter.quickRouter,
+						router: uniswapRouter.quickswap,
 					}]
 				}, { gasLimit: 1000000 })
 			)
