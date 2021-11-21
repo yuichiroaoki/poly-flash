@@ -1,6 +1,13 @@
-# Smart Contract Dev Template
+# Poly-Flash
 
-Template for smart contract development using Typescript & Hardhat
+An open source flashloan bot on polygon network
+
+## Installation
+```bash
+git clone https://github.com/yuichiroaoki/poly-flash.git
+cd poly-flash
+yarn install
+```
 
 ## Available Scripts
 
