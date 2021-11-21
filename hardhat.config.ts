@@ -14,7 +14,7 @@ import "./tasks/block-number";
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
-module.exports = {
+const configForTest = {
   solidity: {
     compilers: [
       {
@@ -25,7 +25,51 @@ module.exports = {
       },
     ],
   },
+  networks: {
+    hardhat: {
+      forking: {
+        url: process.env.ALCHEMY_POLYGON_RPC_URL,
+        blockNumber: 20548800
+      }
+    },
+  },
+  mocha: {
+    timeout: 200000
+  }
+} 
+
+/**
+ * @type import('hardhat/config').HardhatUserConfig
+ */
+const configLocal = {
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.4",
+      },
+      {
+        version: "0.6.12",
+      },
+    ],
+  },
+  networks: {
+    hardhat: {
+      forking: {
+        url: process.env.ALCHEMY_POLYGON_RPC_URL,
+        blockNumber: 21212252
+      }
+    },
+    polygon: {
+      url: process.env.ALCHEMY_POLYGON_RPC_URL,
+      accounts: [`0x${process.env.PRIVATE_KEY}`]
+    },
+  },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
-};
+  mocha: {
+    timeout: 200000
+  }
+}
+
+module.exports = process.env.PRIVATE_KEY ? configLocal : configForTest;
