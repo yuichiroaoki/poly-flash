@@ -3,10 +3,44 @@
 An open source flashloan bot on polygon network
 
 ## Installation
+
+### 1. Install [Node.js](https://nodejs.org/en/) & [yarn](https://classic.yarnpkg.com/en/docs/install/#windows-stable), if you haven't already.
+
+### 2. Clone This Repo
+Run the following command.
 ```bash
 git clone https://github.com/yuichiroaoki/poly-flash.git
 cd poly-flash
+```
+
+## Quickstart
+Right now this repo only works with hardhat mainnet fork.
+
+### 1. Setup Environment Variables
+You'll need an ALCHEMY_POLYGON_RPC_URL environment variable. You can get one from [Alchemy website](https://alchemy.com/?r=33851811-6ecf-40c3-a36d-d0452dda8634) for free.
+
+Then, you can create a .env file with the following.
+
+```
+ALCHEMY_POLYGON_RPC_URL='<your-own-alchemy-polygon-mainnet-rpc-url>'
+```
+
+### 2. Install Dependencies
+Run the following command.
+```bash
 yarn install
+```
+
+### 3. Compile Smart Contracts
+Run the following command.
+```bash
+yarn compile
+```
+
+### 4. Test on Polygon Mainnet Fork 🔥
+Run the following command.
+```bash
+yarn test test/flashloan.test.ts
 ```
 
 ## Available Scripts
