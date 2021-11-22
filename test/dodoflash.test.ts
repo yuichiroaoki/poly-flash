@@ -6,10 +6,10 @@ import {
 	DODOFlashloan,
 	DODOFlashloan__factory,
 } from "../typechain";
-import { DAI_WHALE, dodoV2Pool, polyDAI } from "../constrants/addresses"
+import { dodoV2Pool, polyDAI } from "../constrants/addresses"
 import { Contract } from "@ethersproject/contracts";
-import { impersonateFundErc20 } from "../utils/token"
 import { getBigNumber } from "../utils"
+import { emit } from "process";
 
 describe("dodo flashloan", () => {
 	let Sample: DODOFlashloan;
@@ -43,17 +43,21 @@ describe("dodo flashloan", () => {
 		await fixture();
 	});
 
-	describe("flashloan", async () => {
+	describe("DODO flashloan", async () => {
 
 		it("should execute flashloan", async () => {
-			await impersonateFundErc20(DAI, DAI_WHALE, Sample.address, "100.0");
+			console.log("borrowing 1000 DAI from DODOs USDC/DAI pool")
 			await expect(
 				Sample.dodoFlashLoan(
 					dodoV2Pool.USDC_DAI,
 					getBigNumber(1000),
 					polyDAI
 				)
-			).to.not.reverted;
+			)
+			.emit(Sample, "checkBorrowedAmount")
+			.withArgs(polyDAI, getBigNumber(1000))
+			.emit(Sample, "payBackLoan")
+			.withArgs(polyDAI, getBigNumber(1000));
 		});
 
 	});
