@@ -15,6 +15,7 @@ describe("Flashloan", () => {
 	let DAI: ERC20Mock;
 	let USDC: ERC20Mock;
 	let WMATIC: ERC20Mock;
+	let WETH: ERC20Mock;
 
 	beforeEach(async () => {
 		[owner, addr1, addr2, ...addrs] = await ethers.getSigners();
@@ -27,6 +28,7 @@ describe("Flashloan", () => {
 
 		USDC = await getERC20ContractFromAddress(erc20Address.USDC)
 		DAI = await getERC20ContractFromAddress(erc20Address.DAI)
+		WETH = await getERC20ContractFromAddress(erc20Address.WETH)
 		WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC)
 	});
 
@@ -67,6 +69,28 @@ describe("Flashloan", () => {
 				.emit(Flashloan, "SwapFinished")
 				.emit(Flashloan, "SentProfit");
 			const balance = await USDC.balanceOf(owner.address);
+			expect(balance.gt(getBigNumber(80, 6))).to.be.true;
+		});
+
+		it("should borrow weth and execute flashloan.", async () => {
+			await impersonateFundErc20(WETH, DAI_WHALE, Flashloan.address, "1.0", 18);
+			await expect(
+				Flashloan.dodoFlashLoan({
+					flashLoanPool: dodoV2Pool.WETH_USDC,
+					loanAmount: getBigNumber(1),
+					firstRoutes: [{
+						path: [erc20Address.WETH, erc20Address.DAI],
+						router: uniswapRouter.quickswap
+					}],
+					secondRoutes: [{
+						path: [erc20Address.DAI, erc20Address.WETH],
+						router: uniswapRouter.quickswap
+					}]
+				})
+			)
+				.emit(Flashloan, "SwapFinished")
+				.emit(Flashloan, "SentProfit");
+			const balance = await WETH.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(80, 6))).to.be.true;
 		});
 

@@ -9,7 +9,6 @@ import {
 import { dodoV2Pool, polyDAI } from "../constrants/addresses"
 import { Contract } from "@ethersproject/contracts";
 import { getBigNumber } from "../utils"
-import { emit } from "process";
 
 describe("dodo flashloan", () => {
 	let Sample: DODOFlashloan;
