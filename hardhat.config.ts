@@ -36,7 +36,7 @@ const configForTest = {
   mocha: {
     timeout: 200000
   }
-} 
+}
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -56,13 +56,16 @@ const configLocal = {
     hardhat: {
       forking: {
         url: process.env.ALCHEMY_POLYGON_RPC_URL,
-        blockNumber: 21212252
+        blockNumber: 20548800
       }
     },
     polygon: {
       url: process.env.ALCHEMY_POLYGON_RPC_URL,
       accounts: [`0x${process.env.PRIVATE_KEY}`]
     },
+  },
+  etherscan: {
+    apiKey: process.env.POLYSCAN_APIKEY
   },
   mocha: {
     timeout: 200000
