@@ -74,7 +74,7 @@ describe("Flashloan", () => {
 			expect(balance.gt(getBigNumber(80, 6))).to.be.true;
 		});
 
-		it("should borrow weth and execute flashloan.", async () => {
+		it("should borrow WETH and execute flashloan.", async () => {
 			await impersonateFundErc20(WETH, DAI_WHALE, Flashloan.address, "1.0", 18);
 			await expect(
 				Flashloan.dodoFlashLoan({
@@ -158,7 +158,7 @@ describe("Flashloan", () => {
 			expect(balance.gt(getBigNumber(80, 6))).to.be.true;
 		});
 
-		it("should borrow WETH and execute flashloan.", async () => {
+		it("should borrow DAI and execute flashloan.", async () => {
 			await impersonateFundErc20(DAI, DAI_WHALE, Flashloan.address, "1.0", 18);
 			await expect(
 				Flashloan.dodoFlashLoan({
