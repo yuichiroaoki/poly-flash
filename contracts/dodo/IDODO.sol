@@ -20,4 +20,5 @@ interface IDODO {
     ) external;
 
     function _BASE_TOKEN_() external view returns (address);
+    function _QUOTE_TOKEN_() external view returns (address);
 }

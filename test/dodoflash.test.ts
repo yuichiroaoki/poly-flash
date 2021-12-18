@@ -45,7 +45,7 @@ describe("dodo flashloan", () => {
 	describe("DODO flashloan", async () => {
 
 		it("should execute flashloan", async () => {
-			console.log("borrowing 1000 DAI from DODOs USDC/DAI pool")
+			// borrowing 1000 DAI from DODOs USDC/DAI pool
 			await expect(
 				Sample.dodoFlashLoan(
 					dodoV2Pool.USDC_DAI,
@@ -53,10 +53,10 @@ describe("dodo flashloan", () => {
 					polyDAI
 				)
 			)
-			.emit(Sample, "checkBorrowedAmount")
-			.withArgs(polyDAI, getBigNumber(1000))
-			.emit(Sample, "payBackLoan")
-			.withArgs(polyDAI, getBigNumber(1000));
+				.emit(Sample, "checkBorrowedAmount")
+				.withArgs(polyDAI, getBigNumber(1000))
+				.emit(Sample, "payBackLoan")
+				.withArgs(polyDAI, getBigNumber(1000));
 		});
 
 	});
