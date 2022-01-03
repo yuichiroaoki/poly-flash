@@ -61,7 +61,7 @@ const configLocal = {
     },
     polygon: {
       url: process.env.ALCHEMY_POLYGON_RPC_URL,
-      accounts: [`0x${process.env.PRIVATE_KEY}`]
+      accounts: [process.env.PRIVATE_KEY]
     },
   },
   etherscan: {
