@@ -6,7 +6,7 @@ import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
 import { deployContractFromName, getBigNumber, getERC20ContractFromAddress } from "../utils";
 import { impersonateFundErc20 } from "../utils/token";
 
-describe("FlashloanV2", () => {
+describe("Flashloan", () => {
 	let Flashloan: Flashloan;
 	let owner: SignerWithAddress;
 	let addr1: SignerWithAddress;

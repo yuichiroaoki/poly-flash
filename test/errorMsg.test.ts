@@ -35,7 +35,7 @@ describe("Flashloan Error Message", () => {
 	});
 
 	describe("Error", () => {
-		it("should be reverted with `INSUFFICIENT_INPUT_AMOUNT` when the bot set a wrong dodo pool and the contract can't borrow tokens.", async () => {
+		it("shouldn't be reverted with `INSUFFICIENT_INPUT_AMOUNT` when the bot set a wrong dodo pool and the contract can't borrow tokens.", async () => {
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.WMATIC_USDT,
@@ -49,7 +49,7 @@ describe("Flashloan Error Message", () => {
 						router: uniswapRouter.quickswap
 					}],
 				}, { gasLimit: 1000000 })
-			).to.be.revertedWith("UniswapV2Library: INSUFFICIENT_INPUT_AMOUNT");
+			).to.be.revertedWith("Wrong pool address");
 		});
 
 
