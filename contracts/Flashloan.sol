@@ -18,10 +18,10 @@ contract Flashloan {
     event SentProfit(address recipient, uint256 profit);
     event SwapFinished(address token, uint256 amount);
 
-	struct Route {
-		address[] path;
-		IUniswapV2Router02 router;
-	}
+    struct Route {
+        address[] path;
+        IUniswapV2Router02 router;
+    }
 
     struct FlashParams {
         address flashLoanPool;
@@ -48,21 +48,24 @@ contract Flashloan {
                 secondRoutes: params.secondRoutes
             })
         );
-        address flashLoanBase = IDODO(params.flashLoanPool)._BASE_TOKEN_();
-        if (flashLoanBase == params.firstRoutes[0].path[0]) {
+
+        address loanToken = params.firstRoutes[0].path[0];
+        if (IDODO(params.flashLoanPool)._BASE_TOKEN_() == loanToken) {
             IDODO(params.flashLoanPool).flashLoan(
                 params.loanAmount,
                 0,
+                address(this),
+                data
+            );
+        } else if (IDODO(params.flashLoanPool)._QUOTE_TOKEN_() == loanToken) {
+            IDODO(params.flashLoanPool).flashLoan(
+                0,
+                params.loanAmount,
                 address(this),
                 data
             );
         } else {
-            IDODO(params.flashLoanPool).flashLoan(
-                0,
-                params.loanAmount,
-                address(this),
-                data
-            );
+            revert("Wrong pool address");
         }
     }
 
@@ -97,7 +100,7 @@ contract Flashloan {
     }
 
     function _flashLoanCallBack(
-        address sender,
+        address,
         uint256,
         uint256,
         bytes calldata data
@@ -110,10 +113,9 @@ contract Flashloan {
         address loanToken = decoded.firstRoutes[0].path[0];
 
         require(
-            sender == address(this) && msg.sender == decoded.flashLoanPool,
-            "HANDLE_FLASH_NENIED"
+            IERC20(loanToken).balanceOf(address(this)) >= decoded.loanAmount,
+            "Failed to borrow loan token"
         );
-
 
         for (uint256 i = 0; i < decoded.firstRoutes.length; i++) {
             uniswapV2(decoded.firstRoutes[i]);
@@ -123,18 +125,17 @@ contract Flashloan {
             uniswapV2(decoded.secondRoutes[i]);
         }
 
-        emit SwapFinished(loanToken, IERC20(loanToken).balanceOf(address(this)));
+        emit SwapFinished(
+            loanToken,
+            IERC20(loanToken).balanceOf(address(this))
+        );
 
         require(
-            IERC20(loanToken).balanceOf(address(this)) >=
-                decoded.loanAmount,
+            IERC20(loanToken).balanceOf(address(this)) >= decoded.loanAmount,
             "Not enough amount to return loan"
         );
         //Return funds
-        IERC20(loanToken).transfer(
-            decoded.flashLoanPool,
-            decoded.loanAmount
-        );
+        IERC20(loanToken).transfer(decoded.flashLoanPool, decoded.loanAmount);
 
         // send all loanToken to msg.sender
         uint256 remained = IERC20(loanToken).balanceOf(address(this));
@@ -142,9 +143,7 @@ contract Flashloan {
         emit SentProfit(decoded.me, remained);
     }
 
-    function uniswapV2(
-        Route memory route
-    ) internal returns (uint256[] memory) {
+    function uniswapV2(Route memory route) internal returns (uint256[] memory) {
         uint256 amountIn = IERC20(route.path[0]).balanceOf(address(this));
         require(
             IERC20(route.path[0]).approve(address(route.router), amountIn),

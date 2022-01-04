@@ -35,6 +35,24 @@ describe("Flashloan", () => {
 	});
 
 	describe("Borrow from WETH_USDC", () => {
+
+		it("should revert flashloan when the pool address is wrong.", async () => {
+			await expect(
+				Flashloan.dodoFlashLoan({
+					flashLoanPool: dodoV2Pool.WMATIC_USDT,
+					loanAmount: getBigNumber(1, 6),
+					firstRoutes: [{
+						path: [erc20Address.USDC, erc20Address.DAI],
+						router: uniswapRouter.quickswap,
+					}],
+					secondRoutes: [{
+						path: [erc20Address.DAI, erc20Address.USDC],
+						router: uniswapRouter.quickswap
+					}],
+				}, { gasLimit: 1000000 })
+			).to.be.revertedWith("Wrong pool address");
+		});
+
 		it("should revert flashloan when there's no arbitrage opportunity.", async () => {
 			await expect(
 				Flashloan.dodoFlashLoan({
@@ -119,6 +137,24 @@ describe("Flashloan", () => {
 	});
 
 	describe("Borrow from USDC_DAI", () => {
+
+		it("should revert flashloan when the pool address is wrong.", async () => {
+			await expect(
+				Flashloan.dodoFlashLoan({
+					flashLoanPool: dodoV2Pool.WMATIC_USDT,
+					loanAmount: getBigNumber(1, 6),
+					firstRoutes: [{
+						path: [erc20Address.USDC, erc20Address.DAI],
+						router: uniswapRouter.quickswap,
+					}],
+					secondRoutes: [{
+						path: [erc20Address.DAI, erc20Address.USDC],
+						router: uniswapRouter.quickswap
+					}],
+				}, { gasLimit: 1000000 })
+			).to.be.revertedWith("Wrong pool address");
+		});
+
 		it("should revert flashloan when there's no arbitrage opportunity.", async () => {
 			await expect(
 				Flashloan.dodoFlashLoan({
@@ -203,6 +239,24 @@ describe("Flashloan", () => {
 	});
 
 	describe("Borrow from WMATIC_USDT", () => {
+
+		it("should revert flashloan when the pool address is wrong.", async () => {
+			await expect(
+				Flashloan.dodoFlashLoan({
+					flashLoanPool: dodoV2Pool.USDT_DAI,
+					loanAmount: getBigNumber(1, 6),
+					firstRoutes: [{
+						path: [erc20Address.WMATIC, erc20Address.USDT],
+						router: uniswapRouter.quickswap,
+					}],
+					secondRoutes: [{
+						path: [erc20Address.USDT, erc20Address.WMATIC],
+						router: uniswapRouter.quickswap
+					}],
+				}, { gasLimit: 1000000 })
+			).to.be.revertedWith("Wrong pool address");
+		});
+
 		it("should revert flashloan when there's no arbitrage opportunity.", async () => {
 			await expect(
 				Flashloan.dodoFlashLoan({
