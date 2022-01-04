@@ -10,7 +10,7 @@ import "./uniswap/IUniswapV2Router02.sol";
 import "./dodo/IDODO.sol";
 import "./dodo/IDODOProxy.sol";
 
-contract FlashloanV2 {
+contract Flashloan {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
