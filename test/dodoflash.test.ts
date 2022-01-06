@@ -6,7 +6,7 @@ import {
 	DODOFlashloan,
 	DODOFlashloan__factory,
 } from "../typechain";
-import { dodoV2Pool, polyDAI } from "../constrants/addresses"
+import { dodoV2Pool, erc20Address } from "../constrants/addresses"
 import { Contract } from "@ethersproject/contracts";
 import { getBigNumber } from "../utils"
 
@@ -33,7 +33,7 @@ describe("dodo flashloan", () => {
 			await Sample.deployed()
 
 			DAI = new ethers.Contract(
-				polyDAI, IERC20.abi, provider
+				erc20Address.DAI, IERC20.abi, provider
 			)
 		};
 	});
@@ -50,13 +50,13 @@ describe("dodo flashloan", () => {
 				Sample.dodoFlashLoan(
 					dodoV2Pool.USDC_DAI,
 					getBigNumber(1000),
-					polyDAI
+					erc20Address.DAI
 				)
 			)
 				.emit(Sample, "checkBorrowedAmount")
-				.withArgs(polyDAI, getBigNumber(1000))
+				.withArgs(erc20Address.DAI, getBigNumber(1000))
 				.emit(Sample, "payBackLoan")
-				.withArgs(polyDAI, getBigNumber(1000));
+				.withArgs(erc20Address.DAI, getBigNumber(1000));
 		});
 
 	});
