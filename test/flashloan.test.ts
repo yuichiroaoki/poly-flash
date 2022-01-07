@@ -37,19 +37,19 @@ describe("Flashloan", () => {
 	describe("UniswapV2", () => {
 
 		it("should execute uniswapV2 flashloan.", async () => {
-			await impersonateFundErc20(WETH, WETH_WHALE, Flashloan.address, "1.0")
+			await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6)
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.WETH_USDC,
-					loanAmount: getBigNumber(1),
+					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
-						path: [erc20Address.WETH, erc20Address.WMATIC],
+						path: [erc20Address.USDC, erc20Address.WMATIC],
 						pool: uniswapRouter.quickswap,
 						protocol: 1,
 						fee: []
 					}],
 					secondRoutes: [{
-						path: [erc20Address.WMATIC, erc20Address.WETH],
+						path: [erc20Address.WMATIC, erc20Address.USDC],
 						pool: uniswapRouter.quickswap,
 						protocol: 1,
 						fee: []
@@ -58,7 +58,7 @@ describe("Flashloan", () => {
 			)
 				.emit(Flashloan, "SwapFinished")
 				.emit(Flashloan, "SentProfit");
-			const balance = await WETH.balanceOf(owner.address);
+			const balance = await USDC.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
 
@@ -266,11 +266,11 @@ describe("Flashloan", () => {
 	describe("DODO", () => {
 
 		it("should execute flashloan.", async () => {
-			await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0")
+			await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6)
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.WETH_USDC,
-					loanAmount: getBigNumber(1),
+					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.DAI],
 						pool: uniswapRouter.quickswap,
@@ -287,7 +287,7 @@ describe("Flashloan", () => {
 			)
 				.emit(Flashloan, "SwapFinished")
 				.emit(Flashloan, "SentProfit");
-			const balance = await WETH.balanceOf(owner.address);
+			const balance = await USDC.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
 
