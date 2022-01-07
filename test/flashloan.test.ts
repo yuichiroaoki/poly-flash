@@ -92,27 +92,6 @@ describe("Flashloan", () => {
 
 	describe("Borrow from WETH_USDC", () => {
 
-		it("should revert flashloan when the pool address is wrong.", async () => {
-			await expect(
-				Flashloan.dodoFlashLoan({
-					flashLoanPool: dodoV2Pool.WMATIC_USDT,
-					loanAmount: getBigNumber(1, 6),
-					firstRoutes: [{
-						path: [erc20Address.USDC, erc20Address.DAI],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-					secondRoutes: [{
-						path: [erc20Address.DAI, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-				}, { gasLimit: 1000000 })
-			).to.be.revertedWith("Wrong pool address");
-		});
-
 		it("should revert flashloan when there's no arbitrage opportunity.", async () => {
 			await expect(
 				Flashloan.dodoFlashLoan({
@@ -214,27 +193,6 @@ describe("Flashloan", () => {
 
 	describe("Borrow from USDC_DAI", () => {
 
-		it("should revert flashloan when the pool address is wrong.", async () => {
-			await expect(
-				Flashloan.dodoFlashLoan({
-					flashLoanPool: dodoV2Pool.WMATIC_USDT,
-					loanAmount: getBigNumber(1, 6),
-					firstRoutes: [{
-						path: [erc20Address.USDC, erc20Address.DAI],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-					secondRoutes: [{
-						path: [erc20Address.DAI, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-				}, { gasLimit: 1000000 })
-			).to.be.revertedWith("Wrong pool address");
-		});
-
 		it("should revert flashloan when there's no arbitrage opportunity.", async () => {
 			await expect(
 				Flashloan.dodoFlashLoan({
@@ -331,128 +289,6 @@ describe("Flashloan", () => {
 				.emit(Flashloan, "SentProfit");
 			const balance = await USDC.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(80, 6))).to.be.true;
-		});
-	});
-
-	describe("Borrow from WMATIC_USDT", () => {
-
-		it("should revert flashloan when the pool address is wrong.", async () => {
-			await expect(
-				Flashloan.dodoFlashLoan({
-					flashLoanPool: dodoV2Pool.USDT_DAI,
-					loanAmount: getBigNumber(1, 6),
-					firstRoutes: [{
-						path: [erc20Address.WMATIC, erc20Address.USDT],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-					secondRoutes: [{
-						path: [erc20Address.USDT, erc20Address.WMATIC],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-				}, { gasLimit: 1000000 })
-			).to.be.revertedWith("Wrong pool address");
-		});
-
-		it("should revert flashloan when there's no arbitrage opportunity.", async () => {
-			await expect(
-				Flashloan.dodoFlashLoan({
-					flashLoanPool: dodoV2Pool.WMATIC_USDT,
-					loanAmount: getBigNumber(1),
-					firstRoutes: [{
-						path: [erc20Address.WMATIC, erc20Address.USDT],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-					secondRoutes: [{
-						path: [erc20Address.USDT, erc20Address.WMATIC],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-				}, { gasLimit: 1000000 })
-			).to.be.revertedWith("Not enough amount to return loan");
-		});
-
-		it("should execute flashloan.", async () => {
-			await impersonateFundErc20(WMATIC, WMATIC_WHALE, Flashloan.address, "1.0", 18);
-			await expect(
-				Flashloan.dodoFlashLoan({
-					flashLoanPool: dodoV2Pool.WMATIC_USDT,
-					loanAmount: getBigNumber(1),
-					firstRoutes: [{
-						path: [erc20Address.WMATIC, erc20Address.USDT],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-					secondRoutes: [{
-						path: [erc20Address.USDT, erc20Address.WMATIC],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}]
-				})
-			)
-				.emit(Flashloan, "SwapFinished")
-				.emit(Flashloan, "SentProfit");
-			const balance = await WMATIC.balanceOf(owner.address);
-			expect(balance.gt(getBigNumber(0))).to.be.true;
-		});
-
-		it("should borrow USDT and execute flashloan.", async () => {
-			await impersonateFundErc20(USDT, WMATIC_WHALE, Flashloan.address, "10.0", 6);
-			await expect(
-				Flashloan.dodoFlashLoan({
-					flashLoanPool: dodoV2Pool.WMATIC_USDT,
-					loanAmount: getBigNumber(10, 6),
-					firstRoutes: [{
-						path: [erc20Address.USDT, erc20Address.WMATIC],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-					secondRoutes: [{
-						path: [erc20Address.WMATIC, erc20Address.USDT],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}]
-				})
-			)
-				.emit(Flashloan, "SwapFinished")
-				.emit(Flashloan, "SentProfit");
-			const balance = await USDT.balanceOf(owner.address);
-			expect(balance.gt(getBigNumber(0, 6))).to.be.true;
-		});
-
-		it("should execute flashloan with multihop swaps", async () => {
-			await impersonateFundErc20(WMATIC, WMATIC_WHALE, Flashloan.address, "100.0", 18);
-			await expect(
-				Flashloan.dodoFlashLoan({
-					flashLoanPool: dodoV2Pool.WMATIC_USDT,
-					loanAmount: getBigNumber(100),
-					firstRoutes: [{
-						path: [erc20Address.WMATIC, erc20Address.USDT, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-					secondRoutes: [{
-						path: [erc20Address.USDC, erc20Address.USDT, erc20Address.WMATIC],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}]
-				}, { gasLimit: 1000000 })
-			)
-				.emit(Flashloan, "SentProfit");
-			const balance = await WMATIC.balanceOf(owner.address);
-			expect(balance.gt(getBigNumber(80))).to.be.true;
 		});
 	});
 
