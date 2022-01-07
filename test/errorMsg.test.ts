@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { DAI_WHALE, dodoV2Pool, erc20Address, uniswapRouter, WMATIC_WHALE } from "../constrants/addresses";
+import { WETH_WHALE, dodoV2Pool, erc20Address, uniswapRouter, WMATIC_WHALE } from "../constrants/addresses";
 import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
 import { deployContractFromName, getBigNumber, getERC20ContractFromAddress } from "../utils";
 import { impersonateFundErc20 } from "../utils/token";
@@ -59,7 +59,7 @@ describe("Flashloan Error Message", () => {
 
 
 		it("should be reverted because of the low gas limit.", async () => {
-			await impersonateFundErc20(WETH, DAI_WHALE, Flashloan.address, "1.0", 18);
+			await impersonateFundErc20(WETH, WETH_WHALE, Flashloan.address, "1.0", 18);
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.WETH_USDC,

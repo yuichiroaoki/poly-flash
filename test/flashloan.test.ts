@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { DAI_WHALE, dodoV2Pool, erc20Address, uniswapRouter, WMATIC_WHALE } from "../constrants/addresses";
+import { WETH_WHALE, dodoV2Pool, erc20Address, uniswapRouter, WMATIC_WHALE } from "../constrants/addresses";
 import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
 import { deployContractFromName, getBigNumber, getERC20ContractFromAddress } from "../utils";
 import { impersonateFundErc20 } from "../utils/token";
@@ -37,7 +37,7 @@ describe("Flashloan", () => {
 	describe("UniswapV2", () => {
 
 		it("should execute uniswapV2 flashloan.", async () => {
-			await impersonateFundErc20(WETH, DAI_WHALE, Flashloan.address, "1.0")
+			await impersonateFundErc20(WETH, WETH_WHALE, Flashloan.address, "1.0")
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.WETH_USDC,
@@ -63,7 +63,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan with multihop swaps", async () => {
-			await impersonateFundErc20(USDC, DAI_WHALE, Flashloan.address, "100.0", 6);
+			await impersonateFundErc20(USDC, WETH_WHALE, Flashloan.address, "100.0", 6);
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.WETH_USDC,
@@ -114,7 +114,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan.", async () => {
-			await impersonateFundErc20(USDC, DAI_WHALE, Flashloan.address, "100.0", 6);
+			await impersonateFundErc20(USDC, WETH_WHALE, Flashloan.address, "100.0", 6);
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.WETH_USDC,
@@ -140,7 +140,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should borrow WETH and execute flashloan.", async () => {
-			await impersonateFundErc20(WETH, DAI_WHALE, Flashloan.address, "1.0", 18);
+			await impersonateFundErc20(WETH, WETH_WHALE, Flashloan.address, "1.0", 18);
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.WETH_USDC,
@@ -166,7 +166,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan with multihop swaps", async () => {
-			await impersonateFundErc20(USDC, DAI_WHALE, Flashloan.address, "100.0", 6);
+			await impersonateFundErc20(USDC, WETH_WHALE, Flashloan.address, "100.0", 6);
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.WETH_USDC,
@@ -215,7 +215,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan.", async () => {
-			await impersonateFundErc20(USDC, DAI_WHALE, Flashloan.address, "100.0", 6);
+			await impersonateFundErc20(USDC, WETH_WHALE, Flashloan.address, "100.0", 6);
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.USDC_DAI,
@@ -241,7 +241,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should borrow DAI and execute flashloan.", async () => {
-			await impersonateFundErc20(DAI, DAI_WHALE, Flashloan.address, "1.0", 18);
+			await impersonateFundErc20(DAI, WETH_WHALE, Flashloan.address, "1.0", 18);
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.USDC_DAI,
@@ -267,7 +267,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan with multihop swaps", async () => {
-			await impersonateFundErc20(USDC, DAI_WHALE, Flashloan.address, "100.0", 6);
+			await impersonateFundErc20(USDC, WETH_WHALE, Flashloan.address, "100.0", 6);
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.USDC_DAI,
@@ -295,7 +295,7 @@ describe("Flashloan", () => {
 	describe("UniswapV3", () => {
 
 		it("should execute flashloan and swap on uniswapV3.", async () => {
-			await impersonateFundErc20(USDT, DAI_WHALE, Flashloan.address, "1.0", 6)
+			await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.USDC_USDT,
@@ -321,7 +321,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan and swap on uniswapV3 multihop.", async () => {
-			await impersonateFundErc20(USDT, DAI_WHALE, Flashloan.address, "1.0", 6)
+			await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.USDC_USDT,
@@ -347,7 +347,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan and swap on uniswapV3 and dodo.", async () => {
-			await impersonateFundErc20(USDT, DAI_WHALE, Flashloan.address, "1.0", 6)
+			await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.USDC_USDT,
@@ -381,7 +381,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan and swap on uniswapV3 and uniswapV2.", async () => {
-			await impersonateFundErc20(USDT, DAI_WHALE, Flashloan.address, "1.0", 6)
+			await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.USDC_USDT,
@@ -409,7 +409,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan and swap on uniswapV3 with multihop and uniswapV2.", async () => {
-			await impersonateFundErc20(USDT, DAI_WHALE, Flashloan.address, "1.0", 6)
+			await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.USDC_USDT,
@@ -437,7 +437,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan and swap on uniswapV3 with multihop and uniswapV2.", async () => {
-			await impersonateFundErc20(USDT, DAI_WHALE, Flashloan.address, "1.0", 6)
+			await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.USDC_USDT,
@@ -469,7 +469,7 @@ describe("Flashloan", () => {
 	describe("DODO", () => {
 
 		it("should execute flashloan.", async () => {
-			await impersonateFundErc20(WETH, DAI_WHALE, Flashloan.address, "1.0")
+			await impersonateFundErc20(WETH, WETH_WHALE, Flashloan.address, "1.0")
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.WETH_USDC,
@@ -495,7 +495,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan and swap on uniswap forks and dodo.", async () => {
-			await impersonateFundErc20(USDT, DAI_WHALE, Flashloan.address, "1.0", 6)
+			await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.USDC_USDT,
@@ -529,7 +529,7 @@ describe("Flashloan", () => {
 		});
 
 		it("should execute flashloan and swap.", async () => {
-			await impersonateFundErc20(USDT, DAI_WHALE, Flashloan.address, "1.0", 6)
+			await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
 			await expect(
 				Flashloan.dodoFlashLoan({
 					flashLoanPool: dodoV2Pool.USDC_USDT,
