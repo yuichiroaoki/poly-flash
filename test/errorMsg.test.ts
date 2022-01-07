@@ -36,49 +36,6 @@ describe("Flashloan Error Message", () => {
 	});
 
 	describe("Error", () => {
-		it("shouldn't be reverted with `INSUFFICIENT_INPUT_AMOUNT` when the bot set a wrong dodo pool and the contract can't borrow tokens.", async () => {
-			await expect(
-				Flashloan.dodoFlashLoan({
-					flashLoanPool: dodoV2Pool.WMATIC_WETH,
-					loanAmount: getBigNumber(1, 6),
-					firstRoutes: [{
-						path: [erc20Address.USDC, erc20Address.DAI],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-					secondRoutes: [{
-						path: [erc20Address.DAI, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-				}, { gasLimit: 1000000 })
-			).to.be.revertedWith("Wrong pool address");
-		});
-
-
-		it("should be reverted because of the low gas limit.", async () => {
-			await impersonateFundErc20(WETH, WETH_WHALE, Flashloan.address, "1.0", 18);
-			await expect(
-				Flashloan.dodoFlashLoan({
-					flashLoanPool: dodoV2Pool.WETH_USDC,
-					loanAmount: getBigNumber(1),
-					firstRoutes: [{
-						path: [erc20Address.WETH, erc20Address.DAI],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}],
-					secondRoutes: [{
-						path: [erc20Address.DAI, erc20Address.WETH],
-						pool: uniswapRouter.quickswap,
-						protocol: 1,
-						fee: []
-					}]
-				}, { gasLimit: 50000 })
-			).to.be.reverted;
-		});
 
 		it("should revert flashloan when the flashloan pool address is wrong.", async () => {
 			await expect(
