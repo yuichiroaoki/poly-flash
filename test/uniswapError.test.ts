@@ -6,7 +6,7 @@ import {
 	UniswapFork, UniswapFork__factory,
 } from "../typechain";
 import { 
-	WETH_WHALE, erc20Address, uniswapRouter 
+	WETH_WHALE, erc20Address, uniswapRouter, USDC_WHALE 
 } from "../constrants/addresses"
 import { impersonateFundErc20 } from "../utils/token"
 import { getBigNumber, getERC20ContractFromAddress } from "../utils"
@@ -64,7 +64,7 @@ describe("Swap on uniswap fork on polygon", () => {
 
 		it("should be reverted with `INSUFFICIENT_INPUT_AMOUNT`.", async () => {
 
-			await impersonateFundErc20(USDC, WETH_WHALE, uniswapFork.address, "100.0", 6);
+			await impersonateFundErc20(USDC, USDC_WHALE, uniswapFork.address, "100.0", 6);
 			await expect(
 				uniswapFork.uniswapFork(
 					uniswapRouter.quickswap,

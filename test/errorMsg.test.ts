@@ -39,7 +39,7 @@ describe("Flashloan Error Message", () => {
 		it("shouldn't be reverted with `INSUFFICIENT_INPUT_AMOUNT` when the bot set a wrong dodo pool and the contract can't borrow tokens.", async () => {
 			await expect(
 				Flashloan.dodoFlashLoan({
-					flashLoanPool: dodoV2Pool.WETH_USDC,
+					flashLoanPool: dodoV2Pool.WMATIC_WETH,
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.DAI],
