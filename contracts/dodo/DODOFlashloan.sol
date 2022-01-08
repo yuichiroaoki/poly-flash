@@ -10,17 +10,17 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // import {IERC20} from "./intf/IERC20.sol";
 
 import "hardhat/console.sol";
+import "./IDODO.sol";
+// interface IDODO {
+//     function flashLoan(
+//         uint256 baseAmount,
+//         uint256 quoteAmount,
+//         address assetTo,
+//         bytes calldata data
+//     ) external;
 
-interface IDODO {
-    function flashLoan(
-        uint256 baseAmount,
-        uint256 quoteAmount,
-        address assetTo,
-        bytes calldata data
-    ) external;
-
-    function _BASE_TOKEN_() external view returns (address);
-}
+//     function _BASE_TOKEN_() external view returns (address);
+// }
 
 contract DODOFlashloan {
     event checkBorrowedAmount(address token, uint256 amount);
