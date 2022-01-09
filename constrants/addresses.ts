@@ -1,5 +1,5 @@
 export const polyDAI = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
-export const polyMatic = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+export const polyMatic = "0x0000000000000000000000000000000000001010";
 export const polyAAVEAddressProvider = "0xd05e3E715d945B59290df0ae8eF85c1BdB684744"
 export const DAI_WHALE = "0x0298B2eCdef68BC139B098461217a5B3161B69C8"
 export const WMATIC_WHALE = "0xFffbCD322cEace527C8ec6Da8de2461C6D9d4e6e"
