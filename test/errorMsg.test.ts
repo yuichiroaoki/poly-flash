@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { DAI_WHALE, dodoV2Pool, erc20Address, uniswapRouter, WMATIC_WHALE } from "../constrants/addresses";
+import { BurnAddress, DAI_WHALE, dodoV2Pool, erc20Address, uniswapRouter, WMATIC_WHALE } from "../constrants/addresses";
 import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
 import { deployContractFromName, getBigNumber, getERC20ContractFromAddress } from "../utils";
 import { impersonateFundErc20 } from "../utils/token";
@@ -35,6 +35,7 @@ describe("Flashloan Error Message", () => {
 	});
 
 	describe("Error", () => {
+
 		it("shouldn't be reverted with `INSUFFICIENT_INPUT_AMOUNT` when the bot set a wrong dodo pool and the contract can't borrow tokens.", async () => {
 			await expect(
 				Flashloan.dodoFlashLoan({
@@ -84,6 +85,45 @@ describe("Flashloan Error Message", () => {
 					}],
 					secondRoutes: [{
 						path: [erc20Address.WETH, erc20Address.DAI,erc20Address.USDT, erc20Address.USDC],
+						router: uniswapRouter.quickswap,
+					}]
+				}, { gasLimit: 1000000 })
+			)
+				.emit(Flashloan, "SentProfit");
+			const balance = await USDC.balanceOf(owner.address);
+			expect(balance.gt(getBigNumber(80, 6))).to.be.true;
+		});
+
+		it("should be reverted without any error messages when the path includes the burn address.", async () => {
+			await impersonateFundErc20(USDC, DAI_WHALE, Flashloan.address, "100.0", 6);
+			await expect(
+				Flashloan.dodoFlashLoan({
+					flashLoanPool: dodoV2Pool.WETH_USDC,
+					loanAmount: getBigNumber(1, 6),
+					firstRoutes: [{
+						path: [erc20Address.USDC, BurnAddress, erc20Address.WETH],
+						router: uniswapRouter.quickswap,
+					}],
+					secondRoutes: [{
+						path: [erc20Address.WETH, erc20Address.USDC],
+						router: uniswapRouter.quickswap,
+					}]
+				}, { gasLimit: 1000000 })
+			).to.be.revertedWith("");
+		});
+
+		it("should not revert flashloan with wmatic.", async () => {
+			await impersonateFundErc20(USDC, DAI_WHALE, Flashloan.address, "100.0", 6);
+			await expect(
+				Flashloan.dodoFlashLoan({
+					flashLoanPool: dodoV2Pool.WETH_USDC,
+					loanAmount: getBigNumber(1, 6),
+					firstRoutes: [{
+						path: [erc20Address.USDC, erc20Address.WMATIC, erc20Address.WETH],
+						router: uniswapRouter.quickswap,
+					}],
+					secondRoutes: [{
+						path: [erc20Address.WETH, erc20Address.USDC],
 						router: uniswapRouter.quickswap,
 					}]
 				}, { gasLimit: 1000000 })
