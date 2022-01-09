@@ -8,6 +8,7 @@ export const dex1inch = "0x11111112542D85B3EF69AE05771c2dCCff4fAa26"
 export const polyUSDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
 export const polyUSDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
 export const polyWMATIC = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"
+export const BurnAddress = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 
 type ERC20Map = { [erc20: string]: string }
 
