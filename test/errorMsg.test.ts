@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { WETH_WHALE, dodoV2Pool, erc20Address, uniswapRouter, WMATIC_WHALE } from "../constrants/addresses";
+import { dodoV2Pool, erc20Address, uniswapRouter, BurnAddress, USDC_WHALE } from "../constrants/addresses";
 import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
 import { deployContractFromName, getBigNumber, getERC20ContractFromAddress } from "../utils";
 import { impersonateFundErc20 } from "../utils/token";
@@ -142,5 +142,51 @@ describe("Flashloan Error Message", () => {
 			).to.be.revertedWith("Wrong protocol");
 		});
 
+		it("should be reverted without any error messages when the path includes the burn address.", async () => {
+			await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "100.0", 6);
+			await expect(
+				Flashloan.dodoFlashLoan({
+					flashLoanPool: dodoV2Pool.WETH_USDC,
+					loanAmount: getBigNumber(1, 6),
+					firstRoutes: [{
+						path: [erc20Address.USDC, BurnAddress, erc20Address.WETH],
+						pool: uniswapRouter.quickswap,
+						protocol: 1,
+						fee: [], 
+					}],
+					secondRoutes: [{
+						path: [erc20Address.WETH, erc20Address.USDC],
+						pool: uniswapRouter.quickswap,
+						protocol: 1,
+						fee: [], 
+					}]
+				}, { gasLimit: 1000000 })
+			).to.be.revertedWith("");
+		});
+
+		it("should not revert flashloan with wmatic.", async () => {
+			await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "100.0", 6);
+			await expect(
+				Flashloan.dodoFlashLoan({
+					flashLoanPool: dodoV2Pool.WETH_USDC,
+					loanAmount: getBigNumber(1, 6),
+					firstRoutes: [{
+						path: [erc20Address.USDC, erc20Address.WMATIC, erc20Address.WETH],
+						pool: uniswapRouter.quickswap,
+						protocol: 1,
+						fee: [],
+					}],
+					secondRoutes: [{
+						path: [erc20Address.WETH, erc20Address.USDC],
+						pool: uniswapRouter.quickswap,
+						protocol: 1,
+						fee: [],
+					}]
+				}, { gasLimit: 1000000 })
+			)
+				.emit(Flashloan, "SentProfit");
+			const balance = await USDC.balanceOf(owner.address);
+			expect(balance.gt(getBigNumber(80, 6))).to.be.true;
+		});
 	});
 });

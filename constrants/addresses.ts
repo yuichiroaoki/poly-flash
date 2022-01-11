@@ -3,6 +3,7 @@ export const WETH_WHALE = "0x0298B2eCdef68BC139B098461217a5B3161B69C8"
 export const WMATIC_WHALE = "0xFffbCD322cEace527C8ec6Da8de2461C6D9d4e6e"
 export const USDC_WHALE = "0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8"
 export const dex1inch = "0x11111112542D85B3EF69AE05771c2dCCff4fAa26"
+export const BurnAddress = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 
 type ERC20Map = { [erc20: string]: string }
 
