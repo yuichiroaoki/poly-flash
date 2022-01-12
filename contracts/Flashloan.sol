@@ -11,16 +11,16 @@ import "./dodo/IDODO.sol";
 import "./dodo/IDODOProxy.sol";
 import "./interfaces/IFlashloan.sol";
 import "./base/FlashloanValidation.sol";
+import "./base/DodoBase.sol";
 
-contract Flashloan is IFlashloan, FlashloanValidation {
+contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     event SentProfit(address recipient, uint256 profit);
     event SwapFinished(address token, uint256 amount);
 
-
-    function dodoFlashLoan(FlashParams memory params) external {
+    function dodoFlashLoan(FlashParams memory params) external checkParams(params) {
         bytes memory data = abi.encode(
             FlashCallbackData({
                 me: msg.sender,
@@ -46,39 +46,7 @@ contract Flashloan is IFlashloan, FlashloanValidation {
                 address(this),
                 data
             );
-        } else {
-            revert("Wrong flashloan pool address");
         }
-    }
-
-    //Note: CallBack function executed by DODOV2(DVM) flashLoan pool
-    function DVMFlashLoanCall(
-        address sender,
-        uint256 baseAmount,
-        uint256 quoteAmount,
-        bytes calldata data
-    ) external {
-        _flashLoanCallBack(sender, baseAmount, quoteAmount, data);
-    }
-
-    //Note: CallBack function executed by DODOV2(DPP) flashLoan pool
-    function DPPFlashLoanCall(
-        address sender,
-        uint256 baseAmount,
-        uint256 quoteAmount,
-        bytes calldata data
-    ) external {
-        _flashLoanCallBack(sender, baseAmount, quoteAmount, data);
-    }
-
-    //Note: CallBack function executed by DODOV2(DSP) flashLoan pool
-    function DSPFlashLoanCall(
-        address sender,
-        uint256 baseAmount,
-        uint256 quoteAmount,
-        bytes calldata data
-    ) external {
-        _flashLoanCallBack(sender, baseAmount, quoteAmount, data);
     }
 
     function _flashLoanCallBack(
@@ -86,7 +54,7 @@ contract Flashloan is IFlashloan, FlashloanValidation {
         uint256,
         uint256,
         bytes calldata data
-    ) internal {
+    ) internal override {
         FlashCallbackData memory decoded = abi.decode(
             data,
             (FlashCallbackData)
@@ -125,7 +93,10 @@ contract Flashloan is IFlashloan, FlashloanValidation {
         emit SentProfit(decoded.me, remained);
     }
 
-    function pickProtocol(Route memory route) internal checkRouteProtocol(route) {
+    function pickProtocol(Route memory route)
+        internal
+        checkRouteProtocol(route)
+    {
         if (route.protocol == 0) {
             dodoSwap(route);
         } else if (route.protocol == 1) {
@@ -136,7 +107,8 @@ contract Flashloan is IFlashloan, FlashloanValidation {
     }
 
     function uniswapV3(Route memory route)
-        internal checkRouteUniswapV3(route)
+        internal
+        checkRouteUniswapV3(route)
         returns (uint256 amountOut)
     {
         address inputToken = route.path[0];
