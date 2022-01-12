@@ -9,35 +9,16 @@ import "./uniswap/v3/ISwapRouter.sol";
 
 import "./dodo/IDODO.sol";
 import "./dodo/IDODOProxy.sol";
+import "./interfaces/IFlashloan.sol";
+import "./base/FlashloanValidation.sol";
 
-contract Flashloan {
+contract Flashloan is IFlashloan, FlashloanValidation {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     event SentProfit(address recipient, uint256 profit);
     event SwapFinished(address token, uint256 amount);
 
-    struct Route {
-        address[] path;
-        uint8 protocol;
-        address pool;
-        uint24[] fee;
-    }
-
-    struct FlashParams {
-        address flashLoanPool;
-        uint256 loanAmount;
-        Route[] firstRoutes;
-        Route[] secondRoutes;
-    }
-
-    struct FlashCallbackData {
-        address me;
-        address flashLoanPool;
-        uint256 loanAmount;
-        Route[] firstRoutes;
-        Route[] secondRoutes;
-    }
 
     function dodoFlashLoan(FlashParams memory params) external {
         bytes memory data = abi.encode(
@@ -154,12 +135,6 @@ contract Flashloan {
         } else {
             revert("Wrong protocol");
         }
-    }
-
-    modifier checkRoutesUniswapV3(Route memory route) {
-        require(route.path.length >= 2, "Wrong route length");
-        require(route.fee.length + 1 == route.path.length, "Wrong fee length");
-        _;
     }
 
     function uniswapV3(Route memory route)
