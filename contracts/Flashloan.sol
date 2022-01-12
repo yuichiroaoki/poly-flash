@@ -12,10 +12,12 @@ import "./dodo/IDODOProxy.sol";
 import "./interfaces/IFlashloan.sol";
 import "./base/FlashloanValidation.sol";
 import "./base/DodoBase.sol";
+import "./libraries/BytesLib.sol";
 
 contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
+    using BytesLib for bytes;
 
     event SentProfit(address recipient, uint256 profit);
     event SwapFinished(address token, uint256 amount);
@@ -137,16 +139,14 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
             // multihop swaps
             bytes memory tokenFee = "";
             for (uint8 i = 0; i < route.path.length - 1; i++) {
-                tokenFee = MergeBytes(
-                    tokenFee,
+                tokenFee = tokenFee.merge(
                     abi.encodePacked(route.path[i], route.fee[i])
                 );
             }
 
             amountOut = swapRouter.exactInput(
                 ISwapRouter.ExactInputParams({
-                    path: MergeBytes(
-                        tokenFee,
+                    path: tokenFee.merge(
                         abi.encodePacked(route.path[route.path.length - 1])
                     ),
                     recipient: address(this),
@@ -155,51 +155,6 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
                     amountOutMinimum: 0
                 })
             );
-        }
-    }
-
-    // https://ethereum.stackexchange.com/questions/32003/concat-two-bytes-arrays-with-assembly
-    function MergeBytes(bytes memory a, bytes memory b)
-        internal
-        pure
-        returns (bytes memory c)
-    {
-        // Store the length of the first array
-        uint256 alen = a.length;
-        // Store the length of BOTH arrays
-        uint256 totallen = alen + b.length;
-        // Count the loops required for array a (sets of 32 bytes)
-        uint256 loopsa = (a.length + 31) / 32;
-        // Count the loops required for array b (sets of 32 bytes)
-        uint256 loopsb = (b.length + 31) / 32;
-        assembly {
-            let m := mload(0x40)
-            // Load the length of both arrays to the head of the new bytes array
-            mstore(m, totallen)
-            // Add the contents of a to the array
-            for {
-                let i := 0
-            } lt(i, loopsa) {
-                i := add(1, i)
-            } {
-                mstore(
-                    add(m, mul(32, add(1, i))),
-                    mload(add(a, mul(32, add(1, i))))
-                )
-            }
-            // Add the contents of b to the array
-            for {
-                let i := 0
-            } lt(i, loopsb) {
-                i := add(1, i)
-            } {
-                mstore(
-                    add(m, add(mul(32, add(1, i)), alen)),
-                    mload(add(b, mul(32, add(1, i))))
-                )
-            }
-            mstore(0x40, add(m, add(32, totallen)))
-            c := m
         }
     }
 
