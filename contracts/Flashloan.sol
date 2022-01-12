@@ -125,20 +125,18 @@ contract Flashloan is IFlashloan, FlashloanValidation {
         emit SentProfit(decoded.me, remained);
     }
 
-    function pickProtocol(Route memory route) internal {
+    function pickProtocol(Route memory route) internal checkRouteProtocol(route) {
         if (route.protocol == 0) {
             dodoSwap(route);
         } else if (route.protocol == 1) {
             uniswapV2(route);
         } else if (route.protocol == 2) {
             uniswapV3(route);
-        } else {
-            revert("Wrong protocol");
         }
     }
 
     function uniswapV3(Route memory route)
-        internal checkRoutesUniswapV3(route)
+        internal checkRouteUniswapV3(route)
         returns (uint256 amountOut)
     {
         address inputToken = route.path[0];
