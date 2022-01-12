@@ -11,7 +11,7 @@ abstract contract FlashloanValidation is IFlashloan {
     }
 
 	modifier checkRouteProtocol(Route memory route) {
-		require(route.protocol > 2, "Wrong protocol");
+		require(route.protocol < 3, "Wrong protocol");
 		_;
 	}
 }
