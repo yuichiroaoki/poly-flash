@@ -156,8 +156,14 @@ contract Flashloan {
         }
     }
 
+    modifier checkRoutesUniswapV3(Route memory route) {
+        require(route.path.length >= 2, "Wrong route length");
+        require(route.fee.length + 1 == route.path.length, "Wrong fee length");
+        _;
+    }
+
     function uniswapV3(Route memory route)
-        internal
+        internal checkRoutesUniswapV3(route)
         returns (uint256 amountOut)
     {
         address inputToken = route.path[0];
@@ -183,13 +189,9 @@ contract Flashloan {
                 })
             );
         } else if (route.path.length > 2) {
-            require(
-                route.fee.length + 1 == route.path.length,
-                "Wrong fee length"
-            );
             // multihop swaps
             bytes memory tokenFee = "";
-            for (uint8 i = 0; i < route.path.length-1; i++) {
+            for (uint8 i = 0; i < route.path.length - 1; i++) {
                 tokenFee = MergeBytes(
                     tokenFee,
                     abi.encodePacked(route.path[i], route.fee[i])
@@ -198,17 +200,16 @@ contract Flashloan {
 
             amountOut = swapRouter.exactInput(
                 ISwapRouter.ExactInputParams({
-                    path: MergeBytes(tokenFee, abi.encodePacked(
-                        route.path[route.path.length-1]
-                    )),
+                    path: MergeBytes(
+                        tokenFee,
+                        abi.encodePacked(route.path[route.path.length - 1])
+                    ),
                     recipient: address(this),
                     deadline: block.timestamp,
                     amountIn: amountIn,
                     amountOutMinimum: 0
                 })
             );
-        } else {
-            revert("Wrong route length");
         }
     }
 
