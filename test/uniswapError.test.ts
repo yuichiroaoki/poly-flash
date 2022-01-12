@@ -52,7 +52,7 @@ describe("Swap on uniswap fork on polygon", () => {
 		it("should be reverted when you don't have a base token.", async () => {
 			await expect(
 				uniswapFork.uniswapFork(
-					uniswapRouter.quickswap,
+					uniswapRouter.POLYGON_QUICKSWAP,
 					erc20Address.DAI,
 					getBigNumber(1),
 					1,
@@ -67,7 +67,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(USDC, USDC_WHALE, uniswapFork.address, "100.0", 6);
 			await expect(
 				uniswapFork.uniswapFork(
-					uniswapRouter.quickswap,
+					uniswapRouter.POLYGON_QUICKSWAP,
 					erc20Address.USDC,
 					getBigNumber(1, 6),
 					getBigNumber(1),

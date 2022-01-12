@@ -53,7 +53,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.quickswap,
+					uniswapRouter.POLYGON_QUICKSWAP,
 					erc20Address.DAI,
 					getBigNumber(1),
 					1,
@@ -67,7 +67,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(USDC, USDC_WHALE, Sushi.address, "100.0", 6);
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.quickswap,
+					uniswapRouter.POLYGON_QUICKSWAP,
 					erc20Address.USDC,
 					getBigNumber(1, 6),
 					1,
@@ -81,7 +81,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.quickswap,
+					uniswapRouter.POLYGON_QUICKSWAP,
 					erc20Address.DAI,
 					getBigNumber(100),
 					1,
@@ -97,7 +97,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.sushiswap,
+					uniswapRouter.POLYGON_SUSHISWAP,
 					erc20Address.DAI,
 					getBigNumber(1),
 					1,
@@ -111,7 +111,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(USDC, USDC_WHALE, Sushi.address, "100.0", 6);
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.sushiswap,
+					uniswapRouter.POLYGON_SUSHISWAP,
 					erc20Address.USDC,
 					getBigNumber(1, 6),
 					1,
@@ -125,7 +125,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.sushiswap,
+					uniswapRouter.POLYGON_SUSHISWAP,
 					erc20Address.DAI,
 					getBigNumber(100),
 					1,
@@ -141,7 +141,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.waultswap,
+					uniswapRouter.POLYGON_WAULTSWAP,
 					erc20Address.DAI,
 					getBigNumber(1),
 					1,
@@ -155,7 +155,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(USDC, USDC_WHALE, Sushi.address, "100.0", 6);
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.waultswap,
+					uniswapRouter.POLYGON_WAULTSWAP,
 					erc20Address.USDC,
 					getBigNumber(1, 6),
 					1,
@@ -169,7 +169,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.waultswap,
+					uniswapRouter.POLYGON_WAULTSWAP,
 					erc20Address.DAI,
 					getBigNumber(100),
 					1,
@@ -185,7 +185,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.jetswap,
+					uniswapRouter.POLYGON_JETSWAP,
 					erc20Address.DAI,
 					getBigNumber(1),
 					1,
@@ -199,7 +199,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(USDC, USDC_WHALE, Sushi.address, "100.0", 6);
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.jetswap,
+					uniswapRouter.POLYGON_JETSWAP,
 					erc20Address.USDC,
 					getBigNumber(1, 6),
 					1,
@@ -213,7 +213,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.jetswap,
+					uniswapRouter.POLYGON_JETSWAP,
 					erc20Address.DAI,
 					getBigNumber(100),
 					1,
@@ -229,7 +229,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.apeswap,
+					uniswapRouter.POLYGON_APESWAP,
 					erc20Address.DAI,
 					getBigNumber(1),
 					1,
@@ -243,7 +243,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(USDC, USDC_WHALE, Sushi.address, "100.0", 6);
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.apeswap,
+					uniswapRouter.POLYGON_APESWAP,
 					erc20Address.USDC,
 					getBigNumber(1, 6),
 					1,
@@ -257,7 +257,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.apeswap,
+					uniswapRouter.POLYGON_APESWAP,
 					erc20Address.DAI,
 					getBigNumber(100),
 					1,
@@ -273,7 +273,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.polycat,
+					uniswapRouter.POLYGON_POLYCAT,
 					erc20Address.DAI,
 					getBigNumber(1),
 					1,
@@ -287,7 +287,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(USDC, USDC_WHALE, Sushi.address, "100.0", 6);
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.polycat,
+					uniswapRouter.POLYGON_POLYCAT,
 					erc20Address.USDC,
 					getBigNumber(1, 6),
 					1,
@@ -301,7 +301,7 @@ describe("Swap on uniswap fork on polygon", () => {
 			await impersonateFundErc20(DAI, USDC_WHALE, Sushi.address, "100.0");
 			await expect(
 				Sushi.uniswapFork(
-					uniswapRouter.polycat,
+					uniswapRouter.POLYGON_POLYCAT,
 					erc20Address.DAI,
 					getBigNumber(100),
 					1,

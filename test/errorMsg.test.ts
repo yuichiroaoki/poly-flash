@@ -44,7 +44,7 @@ describe("Flashloan Error Message", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.WMATIC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: []
 					}],
@@ -65,7 +65,7 @@ describe("Flashloan Error Message", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.WMATIC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: []
 					}],
@@ -92,7 +92,7 @@ describe("Flashloan Error Message", () => {
 					}],
 					secondRoutes: [{
 						path: [erc20Address.WETH, erc20Address.DAI],
-						pool: uniswapRouter.sushiswap,
+						pool: uniswapRouter.POLYGON_SUSHISWAP,
 						protocol: 1,
 						fee: []
 					}]
@@ -107,7 +107,7 @@ describe("Flashloan Error Message", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.WMATIC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: []
 					}],
@@ -128,7 +128,7 @@ describe("Flashloan Error Message", () => {
 					loanAmount: loanAmount,
 					firstRoutes: [{
 						path: [erc20Address.WETH, erc20Address.WMATIC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 3,
 						fee: []
 					}],
@@ -150,13 +150,13 @@ describe("Flashloan Error Message", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, BurnAddress, erc20Address.WETH],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: [], 
 					}],
 					secondRoutes: [{
 						path: [erc20Address.WETH, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: [], 
 					}]
@@ -172,13 +172,13 @@ describe("Flashloan Error Message", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.WMATIC, erc20Address.WETH],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: [],
 					}],
 					secondRoutes: [{
 						path: [erc20Address.WETH, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: [],
 					}]

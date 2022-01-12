@@ -44,13 +44,13 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.WMATIC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: []
 					}],
 					secondRoutes: [{
 						path: [erc20Address.WMATIC, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: []
 					}]
@@ -70,13 +70,13 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.DAI, erc20Address.WETH],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: []
 					}],
 					secondRoutes: [{
 						path: [erc20Address.WETH, erc20Address.DAI,erc20Address.USDT, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: []
 					}]
@@ -99,13 +99,13 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDT, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 2,
 						fee: [500]
 					}],
 					secondRoutes: [{
 						path: [erc20Address.USDC, erc20Address.USDT],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 2,
 						fee: [500]
 					}]
@@ -125,13 +125,13 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDT, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 2,
 						fee: [500]
 					}],
 					secondRoutes: [{
 						path: [erc20Address.USDC, erc20Address.WMATIC, erc20Address.USDT],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 2,
 						fee: [3000, 500]
 					}]
@@ -151,7 +151,7 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDT, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 2,
 						fee: [500]
 					}],
@@ -164,7 +164,7 @@ describe("Flashloan", () => {
 						},
 						{
 							path: [erc20Address.DAI, erc20Address.USDT],
-							pool: uniswapRouter.quickswap,
+							pool: uniswapRouter.POLYGON_QUICKSWAP,
 							protocol: 1,
 							fee: []
 						}
@@ -185,14 +185,14 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDT, erc20Address.USDC],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 2,
 						fee: [500]
 					}],
 					secondRoutes: [
 						{
 							path: [erc20Address.USDC, erc20Address.USDT],
-							pool: uniswapRouter.quickswap,
+							pool: uniswapRouter.POLYGON_QUICKSWAP,
 							protocol: 1,
 							fee: []
 						}
@@ -213,14 +213,14 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDT, erc20Address.USDC, erc20Address.DAI],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 2,
 						fee: [500, 500]
 					}],
 					secondRoutes: [
 						{
 							path: [erc20Address.DAI, erc20Address.USDT],
-							pool: uniswapRouter.quickswap,
+							pool: uniswapRouter.POLYGON_QUICKSWAP,
 							protocol: 1,
 							fee: []
 						}
@@ -241,14 +241,14 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDT, erc20Address.DAI],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: []
 					}],
 					secondRoutes: [
 						{
 							path: [erc20Address.DAI, erc20Address.USDC, erc20Address.USDT],
-							pool: uniswapRouter.quickswap,
+							pool: uniswapRouter.POLYGON_QUICKSWAP,
 							protocol: 2,
 							fee: [500, 500]
 						}
@@ -273,7 +273,7 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDC, erc20Address.DAI],
-						pool: uniswapRouter.quickswap,
+						pool: uniswapRouter.POLYGON_QUICKSWAP,
 						protocol: 1,
 						fee: []
 					}],
@@ -300,7 +300,7 @@ describe("Flashloan", () => {
 					firstRoutes: [
 						{
 							path: [erc20Address.USDT, erc20Address.DAI],
-							pool: uniswapRouter.quickswap,
+							pool: uniswapRouter.POLYGON_QUICKSWAP,
 							protocol: 1,
 							fee: []
 						},
@@ -313,7 +313,7 @@ describe("Flashloan", () => {
 					],
 					secondRoutes: [{
 						path: [erc20Address.USDC, erc20Address.USDT],
-						pool: uniswapRouter.sushiswap,
+						pool: uniswapRouter.POLYGON_SUSHISWAP,
 						protocol: 1,
 						fee: []
 					}]
@@ -333,7 +333,7 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [{
 						path: [erc20Address.USDT, erc20Address.USDC],
-						pool: uniswapRouter.sushiswap,
+						pool: uniswapRouter.POLYGON_SUSHISWAP,
 						protocol: 1,
 						fee: []
 					}],
@@ -346,7 +346,7 @@ describe("Flashloan", () => {
 						},
 						{
 							path: [erc20Address.DAI, erc20Address.USDT],
-							pool: uniswapRouter.quickswap,
+							pool: uniswapRouter.POLYGON_QUICKSWAP,
 							protocol: 1,
 							fee: []
 						}
