@@ -182,17 +182,25 @@ contract Flashloan {
                     sqrtPriceLimitX96: 0
                 })
             );
-        } else if (route.path.length == 3) {
+        } else if (route.path.length > 2) {
+            require(
+                route.fee.length + 1 == route.path.length,
+                "Wrong fee length"
+            );
             // multihop swaps
+            bytes memory tokenFee = "";
+            for (uint8 i = 0; i < route.path.length-1; i++) {
+                tokenFee = MergeBytes(
+                    tokenFee,
+                    abi.encodePacked(route.path[i], route.fee[i])
+                );
+            }
+
             amountOut = swapRouter.exactInput(
                 ISwapRouter.ExactInputParams({
-                    path: abi.encodePacked(
-                        inputToken,
-                        route.fee[0],
-                        route.path[1],
-                        route.fee[1],
-                        route.path[2]
-                    ),
+                    path: MergeBytes(tokenFee, abi.encodePacked(
+                        route.path[route.path.length-1]
+                    )),
                     recipient: address(this),
                     deadline: block.timestamp,
                     amountIn: amountIn,
@@ -201,6 +209,51 @@ contract Flashloan {
             );
         } else {
             revert("Wrong route length");
+        }
+    }
+
+    // https://ethereum.stackexchange.com/questions/32003/concat-two-bytes-arrays-with-assembly
+    function MergeBytes(bytes memory a, bytes memory b)
+        internal
+        pure
+        returns (bytes memory c)
+    {
+        // Store the length of the first array
+        uint256 alen = a.length;
+        // Store the length of BOTH arrays
+        uint256 totallen = alen + b.length;
+        // Count the loops required for array a (sets of 32 bytes)
+        uint256 loopsa = (a.length + 31) / 32;
+        // Count the loops required for array b (sets of 32 bytes)
+        uint256 loopsb = (b.length + 31) / 32;
+        assembly {
+            let m := mload(0x40)
+            // Load the length of both arrays to the head of the new bytes array
+            mstore(m, totallen)
+            // Add the contents of a to the array
+            for {
+                let i := 0
+            } lt(i, loopsa) {
+                i := add(1, i)
+            } {
+                mstore(
+                    add(m, mul(32, add(1, i))),
+                    mload(add(a, mul(32, add(1, i))))
+                )
+            }
+            // Add the contents of b to the array
+            for {
+                let i := 0
+            } lt(i, loopsb) {
+                i := add(1, i)
+            } {
+                mstore(
+                    add(m, add(mul(32, add(1, i)), alen)),
+                    mload(add(b, mul(32, add(1, i))))
+                )
+            }
+            mstore(0x40, add(m, add(32, totallen)))
+            c := m
         }
     }
 
