@@ -18,6 +18,14 @@ describe("Flashloan", () => {
 	let WETH: ERC20Mock;
 	let USDT: ERC20Mock;
 
+	before(async () => {
+		USDC = await getERC20ContractFromAddress(erc20Address.USDC)
+		USDT = await getERC20ContractFromAddress(erc20Address.USDT)
+		DAI = await getERC20ContractFromAddress(erc20Address.DAI)
+		WETH = await getERC20ContractFromAddress(erc20Address.WETH)
+		WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC)
+	})
+
 	beforeEach(async () => {
 		[owner, addr1, addr2, ...addrs] = await ethers.getSigners();
 
@@ -26,12 +34,6 @@ describe("Flashloan", () => {
 			Flashloan__factory
 		);
 		await Flashloan.deployed();
-
-		USDC = await getERC20ContractFromAddress(erc20Address.USDC)
-		USDT = await getERC20ContractFromAddress(erc20Address.USDT)
-		DAI = await getERC20ContractFromAddress(erc20Address.DAI)
-		WETH = await getERC20ContractFromAddress(erc20Address.WETH)
-		WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC)
 	});
 
 	describe("UniswapV2", () => {

@@ -19,6 +19,14 @@ describe("Flashloan Error Message", () => {
 	let USDT: ERC20Mock;
 	const loanAmount = ethers.BigNumber.from(1000);
 
+	before(async () => {
+		USDC = await getERC20ContractFromAddress(erc20Address.USDC)
+		USDT = await getERC20ContractFromAddress(erc20Address.USDT)
+		DAI = await getERC20ContractFromAddress(erc20Address.DAI)
+		WETH = await getERC20ContractFromAddress(erc20Address.WETH)
+		WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC)
+	})
+
 	beforeEach(async () => {
 		[owner, addr1, addr2, ...addrs] = await ethers.getSigners();
 
@@ -27,12 +35,6 @@ describe("Flashloan Error Message", () => {
 			Flashloan__factory
 		);
 		await Flashloan.deployed();
-
-		USDC = await getERC20ContractFromAddress(erc20Address.USDC)
-		USDT = await getERC20ContractFromAddress(erc20Address.USDT)
-		DAI = await getERC20ContractFromAddress(erc20Address.DAI)
-		WETH = await getERC20ContractFromAddress(erc20Address.WETH)
-		WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC)
 	});
 
 	describe("Dodo", () => {

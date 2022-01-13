@@ -27,6 +27,14 @@ describe("Swap on uniswap fork on polygon", () => {
 	let fixture: any;
 
 	before(async () => {
+		USDC = await getERC20ContractFromAddress(erc20Address.USDC)
+		USDT = await getERC20ContractFromAddress(erc20Address.USDT)
+		DAI = await getERC20ContractFromAddress(erc20Address.DAI)
+		WETH = await getERC20ContractFromAddress(erc20Address.WETH)
+		WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC)
+	})
+
+	before(async () => {
 		fixture = async () => {
 			[owner, addr2, addr2, ...addrs] = await ethers.getSigners();
 
@@ -35,12 +43,6 @@ describe("Swap on uniswap fork on polygon", () => {
 				owner
 			)) as UniswapFork__factory;
 			Sushi = await factory.deploy();
-
-			DAI = await getERC20ContractFromAddress(erc20Address.DAI)
-			USDC = await getERC20ContractFromAddress(erc20Address.USDC)
-			USDT = await getERC20ContractFromAddress(erc20Address.USDT)
-			WETH = await getERC20ContractFromAddress(erc20Address.WETH)
-			WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC)
 		};
 	});
 
