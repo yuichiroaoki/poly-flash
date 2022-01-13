@@ -1,44 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "./uniswap/IUniswapV2Router02.sol";
+import "./uniswap/v3/ISwapRouter.sol";
 
 import "./dodo/IDODO.sol";
 import "./dodo/IDODOProxy.sol";
+import "./interfaces/IFlashloan.sol";
+import "./base/FlashloanValidation.sol";
+import "./base/DodoBase.sol";
+import "./libraries/BytesLib.sol";
 
-contract Flashloan {
+contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
+    using BytesLib for bytes;
 
-    event WithdrawToken(address recipient, uint256 amount);
     event SentProfit(address recipient, uint256 profit);
     event SwapFinished(address token, uint256 amount);
 
-    struct Route {
-        address[] path;
-        IUniswapV2Router02 router;
-    }
-
-    struct FlashParams {
-        address flashLoanPool;
-        uint256 loanAmount;
-        Route[] firstRoutes;
-        Route[] secondRoutes;
-    }
-
-    struct FlashCallbackData {
-        address me;
-        address flashLoanPool;
-        uint256 loanAmount;
-        Route[] firstRoutes;
-        Route[] secondRoutes;
-    }
-
-    function dodoFlashLoan(FlashParams memory params) external {
+    function dodoFlashLoan(FlashParams memory params) external checkParams(params) {
         bytes memory data = abi.encode(
             FlashCallbackData({
                 me: msg.sender,
@@ -64,39 +48,7 @@ contract Flashloan {
                 address(this),
                 data
             );
-        } else {
-            revert("Wrong pool address");
         }
-    }
-
-    //Note: CallBack function executed by DODOV2(DVM) flashLoan pool
-    function DVMFlashLoanCall(
-        address sender,
-        uint256 baseAmount,
-        uint256 quoteAmount,
-        bytes calldata data
-    ) external {
-        _flashLoanCallBack(sender, baseAmount, quoteAmount, data);
-    }
-
-    //Note: CallBack function executed by DODOV2(DPP) flashLoan pool
-    function DPPFlashLoanCall(
-        address sender,
-        uint256 baseAmount,
-        uint256 quoteAmount,
-        bytes calldata data
-    ) external {
-        _flashLoanCallBack(sender, baseAmount, quoteAmount, data);
-    }
-
-    //Note: CallBack function executed by DODOV2(DSP) flashLoan pool
-    function DSPFlashLoanCall(
-        address sender,
-        uint256 baseAmount,
-        uint256 quoteAmount,
-        bytes calldata data
-    ) external {
-        _flashLoanCallBack(sender, baseAmount, quoteAmount, data);
     }
 
     function _flashLoanCallBack(
@@ -104,7 +56,7 @@ contract Flashloan {
         uint256,
         uint256,
         bytes calldata data
-    ) internal {
+    ) internal override {
         FlashCallbackData memory decoded = abi.decode(
             data,
             (FlashCallbackData)
@@ -118,11 +70,11 @@ contract Flashloan {
         );
 
         for (uint256 i = 0; i < decoded.firstRoutes.length; i++) {
-            uniswapV2(decoded.firstRoutes[i]);
+            pickProtocol(decoded.firstRoutes[i]);
         }
 
         for (uint256 i = 0; i < decoded.secondRoutes.length; i++) {
-            uniswapV2(decoded.secondRoutes[i]);
+            pickProtocol(decoded.secondRoutes[i]);
         }
 
         emit SwapFinished(
@@ -143,19 +95,132 @@ contract Flashloan {
         emit SentProfit(decoded.me, remained);
     }
 
+    function pickProtocol(Route memory route)
+        internal
+        checkRouteProtocol(route)
+    {
+        if (route.protocol == 0) {
+            dodoSwap(route);
+        } else if (route.protocol == 1) {
+            uniswapV2(route);
+        } else if (route.protocol == 2) {
+            uniswapV3(route);
+        }
+    }
+
+    function uniswapV3(Route memory route)
+        internal
+        checkRouteUniswapV3(route)
+        returns (uint256 amountOut)
+    {
+        address inputToken = route.path[0];
+        uint256 amountIn = IERC20(inputToken).balanceOf(address(this));
+
+        ISwapRouter swapRouter = ISwapRouter(
+            0xE592427A0AEce92De3Edee1F18E0157C05861564
+        );
+        approveToken(inputToken, address(swapRouter), amountIn);
+
+        if (route.path.length == 2) {
+            // single swaps
+            amountOut = swapRouter.exactInputSingle(
+                ISwapRouter.ExactInputSingleParams({
+                    tokenIn: inputToken,
+                    tokenOut: route.path[1],
+                    fee: route.fee[0],
+                    recipient: address(this),
+                    deadline: block.timestamp,
+                    amountIn: amountIn,
+                    amountOutMinimum: 0,
+                    sqrtPriceLimitX96: 0
+                })
+            );
+        } else if (route.path.length > 2) {
+            // multihop swaps
+            bytes memory tokenFee = "";
+            for (uint8 i = 0; i < route.path.length - 1; i++) {
+                tokenFee = tokenFee.merge(
+                    abi.encodePacked(route.path[i], route.fee[i])
+                );
+            }
+
+            amountOut = swapRouter.exactInput(
+                ISwapRouter.ExactInputParams({
+                    path: tokenFee.merge(
+                        abi.encodePacked(route.path[route.path.length - 1])
+                    ),
+                    recipient: address(this),
+                    deadline: block.timestamp,
+                    amountIn: amountIn,
+                    amountOutMinimum: 0
+                })
+            );
+        }
+    }
+
     function uniswapV2(Route memory route) internal returns (uint256[] memory) {
         uint256 amountIn = IERC20(route.path[0]).balanceOf(address(this));
-        require(
-            IERC20(route.path[0]).approve(address(route.router), amountIn),
-            "approve failed."
-        );
+        approveToken(route.path[0], route.pool, amountIn);
         return
-            route.router.swapExactTokensForTokens(
+            IUniswapV2Router02(route.pool).swapExactTokensForTokens(
                 amountIn,
                 1,
                 route.path,
                 address(this),
-                block.timestamp + 200
+                block.timestamp
             );
+    }
+
+    function dodoSwap(Route memory route) internal {
+        address fromToken = route.path[0];
+        address toToken = route.path[1];
+        uint256 fromTokenAmount = IERC20(fromToken).balanceOf(address(this));
+        address dodoV2Pool = route.pool;
+
+        address[] memory dodoPairs = new address[](1); //one-hop
+        dodoPairs[0] = dodoV2Pool;
+
+        address baseToken = IDODO(dodoV2Pool)._BASE_TOKEN_();
+
+        uint256 directions = baseToken == fromToken ? 0 : 1;
+
+        // pool address validation
+        if (directions == 0) {
+            require(
+                IDODO(dodoV2Pool)._QUOTE_TOKEN_() == toToken,
+                "Wrong dodo V2 pool address"
+            );
+        } else {
+            require(
+                IDODO(dodoV2Pool)._BASE_TOKEN_() == toToken,
+                "Wrong dodo V2 pool address"
+            );
+        }
+
+        uint256 deadline = block.timestamp;
+
+        address dodoApprove = 0x6D310348d5c12009854DFCf72e0DF9027e8cb4f4;
+        approveToken(fromToken, dodoApprove, fromTokenAmount);
+
+        address dodoProxy = 0xa222e6a71D1A1Dd5F279805fbe38d5329C1d0e70;
+
+        IDODOProxy(dodoProxy).dodoSwapV2TokenToToken(
+            fromToken,
+            toToken,
+            fromTokenAmount,
+            1,
+            dodoPairs,
+            directions,
+            false,
+            deadline
+        );
+    }
+
+    function approveToken(
+        address token,
+        address to,
+        uint256 amountIn
+    ) internal {
+        require(IERC20(token).approve(to, amountIn), "approve failed.");
     }
 }

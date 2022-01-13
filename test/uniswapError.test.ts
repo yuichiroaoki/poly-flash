@@ -6,7 +6,7 @@ import {
 	UniswapFork, UniswapFork__factory,
 } from "../typechain";
 import { 
-	DAI_WHALE, erc20Address, uniswapRouter 
+	WETH_WHALE, erc20Address, uniswapRouter, USDC_WHALE 
 } from "../constrants/addresses"
 import { impersonateFundErc20 } from "../utils/token"
 import { getBigNumber, getERC20ContractFromAddress } from "../utils"
@@ -26,6 +26,14 @@ describe("Swap on uniswap fork on polygon", () => {
 	let fixture: any;
 
 	before(async () => {
+		USDC = await getERC20ContractFromAddress(erc20Address.USDC)
+		USDT = await getERC20ContractFromAddress(erc20Address.USDT)
+		DAI = await getERC20ContractFromAddress(erc20Address.DAI)
+		WETH = await getERC20ContractFromAddress(erc20Address.WETH)
+		WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC)
+	})
+
+	before(async () => {
 		fixture = async () => {
 			[owner, addr2, addr2, ...addrs] = await ethers.getSigners();
 
@@ -34,12 +42,6 @@ describe("Swap on uniswap fork on polygon", () => {
 				owner
 			)) as UniswapFork__factory;
 			uniswapFork = await factory.deploy();
-
-			DAI = await getERC20ContractFromAddress(erc20Address.DAI)
-			USDC = await getERC20ContractFromAddress(erc20Address.USDC)
-			USDT = await getERC20ContractFromAddress(erc20Address.USDT)
-			WETH = await getERC20ContractFromAddress(erc20Address.WETH)
-			WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC)
 		};
 	});
 
@@ -52,7 +54,7 @@ describe("Swap on uniswap fork on polygon", () => {
 		it("should be reverted when you don't have a base token.", async () => {
 			await expect(
 				uniswapFork.uniswapFork(
-					uniswapRouter.quickswap,
+					uniswapRouter.POLYGON_QUICKSWAP,
 					erc20Address.DAI,
 					getBigNumber(1),
 					1,
@@ -64,10 +66,10 @@ describe("Swap on uniswap fork on polygon", () => {
 
 		it("should be reverted with `INSUFFICIENT_INPUT_AMOUNT`.", async () => {
 
-			await impersonateFundErc20(USDC, DAI_WHALE, uniswapFork.address, "100.0", 6);
+			await impersonateFundErc20(USDC, USDC_WHALE, uniswapFork.address, "100.0", 6);
 			await expect(
 				uniswapFork.uniswapFork(
-					uniswapRouter.quickswap,
+					uniswapRouter.POLYGON_QUICKSWAP,
 					erc20Address.USDC,
 					getBigNumber(1, 6),
 					getBigNumber(1),

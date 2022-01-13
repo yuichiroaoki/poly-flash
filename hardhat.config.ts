@@ -29,7 +29,7 @@ const configForTest = {
     hardhat: {
       forking: {
         url: process.env.ALCHEMY_POLYGON_RPC_URL,
-        blockNumber: 20548800
+        blockNumber: 23632277
       }
     },
   },
@@ -46,6 +46,12 @@ const configLocal = {
     compilers: [
       {
         version: "0.8.4",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
       },
       {
         version: "0.6.12",
@@ -56,7 +62,7 @@ const configLocal = {
     hardhat: {
       forking: {
         url: process.env.ALCHEMY_POLYGON_RPC_URL,
-        blockNumber: 20548800
+        blockNumber: 23632277
       }
     },
     polygon: {

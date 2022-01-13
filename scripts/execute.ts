@@ -16,11 +16,11 @@ async function main() {
 		loanAmount: getBigNumber(1, 6),
 		firstRoutes: [{
 			path: [erc20Address.USDC, erc20Address.DAI],
-			router: uniswapRouter.quickswap,
+			router: uniswapRouter.POLYGON_QUICKSWAP,
 		}],
 		secondRoutes: [{
 			path: [erc20Address.DAI, erc20Address.USDC],
-			router: uniswapRouter.quickswap,
+			router: uniswapRouter.POLYGON_QUICKSWAP,
 		}]
 	}, { gasLimit: 1000000 })
 	console.log(tx)
