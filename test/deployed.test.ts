@@ -64,7 +64,7 @@ describe("Deployed Contract", () => {
 			}, { gasLimit: 1500000 })
 		)
 			.emit(Flashloan, "SwapFinished")
-			// .emit(Flashloan, "SentProfit");
+			.emit(Flashloan, "SentProfit");
 		const balance = await USDC.balanceOf(owner.address);
 		console.log(ethers.utils.formatUnits(balance, 6));
 		expect(balance.gt(getBigNumber(0))).to.be.true;
@@ -93,7 +93,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDC.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -119,7 +119,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDC.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -149,7 +149,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDT.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -175,7 +175,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDT.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -209,7 +209,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDT.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -237,7 +237,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDT.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -265,7 +265,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDT.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -293,7 +293,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDT.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -321,7 +321,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDT.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -349,7 +349,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDT.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -380,7 +380,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDC.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -414,7 +414,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDT.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
@@ -448,7 +448,7 @@ describe("Deployed Contract", () => {
 				}, { gasLimit: 1000000 })
 			)
 				.emit(Flashloan, "SwapFinished")
-				// .emit(Flashloan, "SentProfit");
+				.emit(Flashloan, "SentProfit");
 			const balance = await USDT.balanceOf(owner.address);
 			expect(balance.gt(getBigNumber(0))).to.be.true;
 		});
