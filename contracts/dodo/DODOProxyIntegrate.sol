@@ -1,4 +1,4 @@
-// This is a file copied from https://github.com/DODOEX/dodo-example/blob/main/contracts/DODOProxyIntegrate.sol
+// This is a file copied from https://github.com/DODOEX/dodo-example/blob/main/solidity/contracts/DODOProxyIntegrate.sol
 /*
     Copyright 2021 DODO ZOO.
     SPDX-License-Identifier: Apache-2.0
