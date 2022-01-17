@@ -6,7 +6,7 @@ import {
 	DODOFlashloan,
 	DODOFlashloan__factory,
 } from "../typechain";
-import { dodoV2Pool, erc20Address } from "../constrants/addresses"
+import { dodoV2Pool, erc20Address } from "../constants/addresses"
 import { Contract } from "@ethersproject/contracts";
 import { getBigNumber } from "../utils"
 

@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { erc20Address, dodoV2Pool } from "../constrants/addresses";
+import { erc20Address, dodoV2Pool } from "../constants/addresses";
 import { ERC20Mock } from "../typechain";
 import { getBigNumber, getERC20ContractFromAddress } from "../utils";
 

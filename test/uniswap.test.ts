@@ -8,7 +8,7 @@ import {
 import { 
 	USDC_WHALE,
 	erc20Address, uniswapRouter, WETH_WHALE 
-} from "../constrants/addresses"
+} from "../constants/addresses"
 import { getErc20Balance, impersonateFundErc20 } from "../utils/token"
 import { getBigNumber, getERC20ContractFromAddress } from "../utils"
 
