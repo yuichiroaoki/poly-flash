@@ -1,4 +1,4 @@
-import { dodoV2Pool, erc20Address, uniswapRouter } from "../constrants/addresses";
+import { dodoV2Pool, erc20Address, uniswapRouter } from "../constants/addresses";
 import { Flashloan, Flashloan__factory } from "../typechain";
 import { getBigNumber, getContractFromAddress, getERC20ContractFromAddress } from "../utils";
 

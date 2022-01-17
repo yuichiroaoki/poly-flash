@@ -7,7 +7,7 @@ import {
 } from "../typechain";
 import { 
 	WETH_WHALE, erc20Address, uniswapRouter, USDC_WHALE 
-} from "../constrants/addresses"
+} from "../constants/addresses"
 import { impersonateFundErc20 } from "../utils/token"
 import { getBigNumber, getERC20ContractFromAddress } from "../utils"
 

@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { dodoV2Pool, erc20Address, uniswapRouter, BurnAddress, USDC_WHALE } from "../constrants/addresses";
+import { dodoV2Pool, erc20Address, uniswapRouter, BurnAddress, USDC_WHALE } from "../constants/addresses";
 import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
 import { deployContractFromName, getBigNumber, getERC20ContractFromAddress } from "../utils";
 import { impersonateFundErc20 } from "../utils/token";
