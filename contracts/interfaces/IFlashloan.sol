@@ -6,6 +6,7 @@ interface IFlashloan {
         address[] path;
         uint8 protocol;
         uint16 part;
+        address router;
     }
 
     struct Route {

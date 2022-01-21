@@ -13,6 +13,8 @@ import "./interfaces/IFlashloan.sol";
 import "./base/FlashloanValidation.sol";
 import "./base/DodoBase.sol";
 import "./libraries/BytesLib.sol";
+import "./libraries/Part.sol";
+import "./libraries/RouteUtils.sol";
 
 contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
     using SafeMath for uint256;
@@ -22,7 +24,10 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
     event SentProfit(address recipient, uint256 profit);
     event SwapFinished(address token, uint256 amount);
 
-    function dodoFlashLoan(FlashParams memory params) external checkParams(params) {
+    function dodoFlashLoan(FlashParams memory params)
+        external
+        checkParams(params)
+    {
         bytes memory data = abi.encode(
             FlashCallbackData({
                 me: msg.sender,
@@ -33,7 +38,7 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
             })
         );
 
-        address loanToken = params.firstRoutes[0].path[0];
+        address loanToken = RouteUtils.getInitialToken(params.firstRoutes[0]);
         if (IDODO(params.flashLoanPool)._BASE_TOKEN_() == loanToken) {
             IDODO(params.flashLoanPool).flashLoan(
                 params.loanAmount,
@@ -62,7 +67,8 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
             (FlashCallbackData)
         );
 
-        address loanToken = decoded.firstRoutes[0].path[0];
+        address loanToken = RouteUtils.getInitialToken(decoded.firstRoutes[0]);
+        address toToken = RouteUtils.getInitialToken(decoded.secondRoutes[0]);
 
         require(
             IERC20(loanToken).balanceOf(address(this)) >= decoded.loanAmount,
@@ -70,11 +76,21 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
         );
 
         for (uint256 i = 0; i < decoded.firstRoutes.length; i++) {
-            pickProtocol(decoded.firstRoutes[i]);
+            uint256 amountIn = Part.partToAmountIn(
+                decoded.firstRoutes[i].part,
+                decoded.loanAmount
+            );
+            routeTrade(decoded.firstRoutes[i], amountIn);
         }
 
+        uint256 toTokenAmount = IERC20(toToken).balanceOf(address(this));
+
         for (uint256 i = 0; i < decoded.secondRoutes.length; i++) {
-            pickProtocol(decoded.secondRoutes[i]);
+            uint256 amountIn = Part.partToAmountIn(
+                decoded.secondRoutes[i].part,
+                toTokenAmount
+            );
+            routeTrade(decoded.secondRoutes[i], amountIn);
         }
 
         emit SwapFinished(
@@ -95,39 +111,48 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
         emit SentProfit(decoded.me, remained);
     }
 
-    function pickProtocol(Route memory route)
-        internal
-        checkRouteProtocol(route)
-    {
-        if (route.protocol == 0) {
-            dodoSwap(route);
-        } else if (route.protocol == 1) {
-            uniswapV2(route);
-        } else if (route.protocol == 2) {
-            uniswapV3(route);
+    function routeTrade(Route memory route, uint256 totalAmount) internal {
+        for (uint256 i = 0; i < route.swap.length; i++) {
+            uint256 amountIn = Part.partToAmountIn(
+                route.swap[i].part,
+                totalAmount
+            );
+            pickProtocol(route.swap[i], amountIn);
         }
     }
 
-    function uniswapV3(Route memory route)
+    function pickProtocol(Swap memory swap, uint256 amountIn)
         internal
-        checkRouteUniswapV3(route)
-        returns (uint256 amountOut)
+        // checkRouteProtocol(swap)
     {
-        address inputToken = route.path[0];
-        uint256 amountIn = IERC20(inputToken).balanceOf(address(this));
+        if (swap.protocol == 0) {
+            // dodoSwap(swap, amountIn);
+        } else if (swap.protocol == 1) {
+            uniswapV2(swap, amountIn);
+        } else if (swap.protocol == 2) {
+            uniswapV3(swap, amountIn);
+        }
+    }
 
-        ISwapRouter swapRouter = ISwapRouter(
-            0xE592427A0AEce92De3Edee1F18E0157C05861564
-        );
+    function uniswapV3(
+        Swap memory swap,
+        uint256 amountIn
+    ) internal 
+    // checkRouteUniswapV3(swap) 
+    returns (uint256 amountOut) {
+        address inputToken = swap.path[0];
+
+        ISwapRouter swapRouter = ISwapRouter(swap.router);
         approveToken(inputToken, address(swapRouter), amountIn);
 
-        if (route.path.length == 2) {
+        if (swap.path.length == 2) {
             // single swaps
             amountOut = swapRouter.exactInputSingle(
                 ISwapRouter.ExactInputSingleParams({
                     tokenIn: inputToken,
-                    tokenOut: route.path[1],
-                    fee: route.fee[0],
+                    tokenOut: swap.path[1],
+                    // fee: swap.fee[0],
+                    fee: 500,
                     recipient: address(this),
                     deadline: block.timestamp,
                     amountIn: amountIn,
@@ -135,47 +160,48 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
                     sqrtPriceLimitX96: 0
                 })
             );
-        } else if (route.path.length > 2) {
-            // multihop swaps
-            bytes memory tokenFee = "";
-            for (uint8 i = 0; i < route.path.length - 1; i++) {
-                tokenFee = tokenFee.merge(
-                    abi.encodePacked(route.path[i], route.fee[i])
-                );
-            }
+        // } else if (swap.path.length > 2) {
+        //     // multihop swaps
+        //     bytes memory tokenFee = "";
+        //     for (uint8 i = 0; i < swap.path.length - 1; i++) {
+        //         tokenFee = tokenFee.merge(
+        //             abi.encodePacked(swap.path[i], swap.fee[i])
+        //         );
+        //     }
 
-            amountOut = swapRouter.exactInput(
-                ISwapRouter.ExactInputParams({
-                    path: tokenFee.merge(
-                        abi.encodePacked(route.path[route.path.length - 1])
-                    ),
-                    recipient: address(this),
-                    deadline: block.timestamp,
-                    amountIn: amountIn,
-                    amountOutMinimum: 0
-                })
-            );
+        //     amountOut = swapRouter.exactInput(
+        //         ISwapRouter.ExactInputParams({
+        //             path: tokenFee.merge(
+        //                 abi.encodePacked(swap.path[swap.path.length - 1])
+        //             ),
+        //             recipient: address(this),
+        //             deadline: block.timestamp,
+        //             amountIn: amountIn,
+        //             amountOutMinimum: 0
+        //         })
+        //     );
         }
     }
 
-    function uniswapV2(Route memory route) internal returns (uint256[] memory) {
-        uint256 amountIn = IERC20(route.path[0]).balanceOf(address(this));
-        approveToken(route.path[0], route.pool, amountIn);
+    function uniswapV2(
+        Swap memory swap,
+        uint256 amountIn
+    ) internal returns (uint256[] memory) {
+        approveToken(swap.path[0], swap.router, amountIn);
         return
-            IUniswapV2Router02(route.pool).swapExactTokensForTokens(
+            IUniswapV2Router02(swap.router).swapExactTokensForTokens(
                 amountIn,
                 1,
-                route.path,
+                swap.path,
                 address(this),
                 block.timestamp
             );
     }
 
-    function dodoSwap(Route memory route) internal {
-        address fromToken = route.path[0];
-        address toToken = route.path[1];
-        uint256 fromTokenAmount = IERC20(fromToken).balanceOf(address(this));
-        address dodoV2Pool = route.pool;
+    function dodoSwap(Swap memory swap, uint256 amountIn) internal {
+        address fromToken = swap.path[0];
+        address toToken = swap.path[1];
+        address dodoV2Pool = swap.router;
 
         address[] memory dodoPairs = new address[](1); //one-hop
         dodoPairs[0] = dodoV2Pool;
@@ -200,14 +226,14 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
         uint256 deadline = block.timestamp;
 
         address dodoApprove = 0x6D310348d5c12009854DFCf72e0DF9027e8cb4f4;
-        approveToken(fromToken, dodoApprove, fromTokenAmount);
+        approveToken(fromToken, dodoApprove, amountIn);
 
         address dodoProxy = 0xa222e6a71D1A1Dd5F279805fbe38d5329C1d0e70;
 
         IDODOProxy(dodoProxy).dodoSwapV2TokenToToken(
             fromToken,
             toToken,
-            fromTokenAmount,
+            amountIn,
             1,
             dodoPairs,
             directions,

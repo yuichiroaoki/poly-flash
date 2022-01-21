@@ -4,14 +4,14 @@ pragma solidity ^0.8.0;
 import "../interfaces/IFlashloan.sol";
 
 abstract contract FlashloanValidation is IFlashloan {
-    modifier checkRouteUniswapV3(Route memory route) {
-        require(route.path.length >= 2, "Wrong route length");
-        require(route.fee.length + 1 == route.path.length, "Wrong fee length");
+    modifier checkRouteUniswapV3(Swap memory swap) {
+        require(swap.path.length >= 2, "Wrong route length");
+        // require(swap.fee.length + 1 == swap.path.length, "Wrong fee length");
         _;
     }
 
-	modifier checkRouteProtocol(Route memory route) {
-		require(route.protocol < 3, "Wrong protocol");
+	modifier checkRouteProtocol(Swap memory swap) {
+		require(swap.protocol < 3, "Wrong protocol");
 		_;
 	}
 }

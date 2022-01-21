@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "../interfaces/IFlashloan.sol";
 import "../dodo/IDODO.sol";
+import "../libraries/RouteUtils.sol";
 
 contract DodoBase is IFlashloan {
     //Note: CallBack function executed by DODOV2(DVM) flashLoan pool
@@ -43,7 +44,7 @@ contract DodoBase is IFlashloan {
     ) internal virtual {}
 
     modifier checkParams(FlashParams memory params) {
-        address loanToken = params.firstRoutes[0].path[0];
+        address loanToken = RouteUtils.getInitialToken(params.firstRoutes[0]);
         bool loanEqBase = loanToken == IDODO(params.flashLoanPool)._BASE_TOKEN_();
         bool loanEqQuote = loanToken == IDODO(params.flashLoanPool)._QUOTE_TOKEN_();
         require(loanEqBase || loanEqQuote, "Wrong flashloan pool address");
