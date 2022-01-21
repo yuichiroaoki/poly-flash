@@ -12,6 +12,6 @@ library Part {
         pure
         returns (uint256 amountIn)
     {
-        amountIn = (total * part) / 10 ** 2;
+        amountIn = (total * part) / 10 ** 4;
     }
 }

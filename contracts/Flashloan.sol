@@ -16,6 +16,8 @@ import "./libraries/BytesLib.sol";
 import "./libraries/Part.sol";
 import "./libraries/RouteUtils.sol";
 
+import "hardhat/console.sol";
+
 contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
@@ -80,6 +82,7 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
                 decoded.firstRoutes[i].part,
                 decoded.loanAmount
             );
+            console.log("callback amountIn", amountIn);
             routeTrade(decoded.firstRoutes[i], amountIn);
         }
 
@@ -90,6 +93,7 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
                 decoded.secondRoutes[i].part,
                 toTokenAmount
             );
+            console.log("amountIn", amountIn);
             routeTrade(decoded.secondRoutes[i], amountIn);
         }
 
@@ -117,6 +121,8 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
                 route.swap[i].part,
                 totalAmount
             );
+
+console.log("amountIn", amountIn);
             pickProtocol(route.swap[i], amountIn);
         }
     }
@@ -128,6 +134,7 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
         if (swap.protocol == 0) {
             // dodoSwap(swap, amountIn);
         } else if (swap.protocol == 1) {
+console.log("pick protocol amountIn", amountIn);
             uniswapV2(swap, amountIn);
         } else if (swap.protocol == 2) {
             uniswapV3(swap, amountIn);
@@ -145,6 +152,7 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
         ISwapRouter swapRouter = ISwapRouter(swap.router);
         approveToken(inputToken, address(swapRouter), amountIn);
 
+console.log("amountIn", amountIn);
         if (swap.path.length == 2) {
             // single swaps
             amountOut = swapRouter.exactInputSingle(
@@ -187,6 +195,8 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
         Swap memory swap,
         uint256 amountIn
     ) internal returns (uint256[] memory) {
+
+console.log("univ2 amountIn", amountIn);
         approveToken(swap.path[0], swap.router, amountIn);
         return
             IUniswapV2Router02(swap.router).swapExactTokensForTokens(
