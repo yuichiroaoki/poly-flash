@@ -29,8 +29,12 @@ contract Router is OwnableUpgradeable {
         }
     }
 
-    function getRouterAddress(uint8 router) external view returns (address) {
-        return routers[router];
+    function getRouterAddress(uint8 routerIdx) external view returns (address) {
+        return routers[routerIdx];
+    }
+
+    function updateRouterAddress(uint8 routerIdx, address router) external {
+        routers[routerIdx] = router;
     }
 
     function getFee(address base, address quote)
@@ -60,7 +64,7 @@ contract Router is OwnableUpgradeable {
         address base,
         address quote,
         uint24 fee
-    ) external {
+    ) external onlyOwner {
         (base, quote) = sortTokenPair(base, quote);
         for (uint8 i = 0; i < pools.length; i++) {
             if (pools[i].base == base && pools[i].quote == quote) {

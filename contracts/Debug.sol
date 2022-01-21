@@ -164,65 +164,65 @@ contract Debug is IFlashloan, FlashloanValidation, DodoBase {
     //     }
     // }
 
-    function uniswapV2(
-        Swap memory swap,
-        uint256 amountIn
-    ) internal returns (uint256[] memory) {
-        console.log("amountIn", amountIn);
-        approveToken(swap.path[0], swap.router, amountIn);
-        return
-            IUniswapV2Router02(swap.router).swapExactTokensForTokens(
-                amountIn,
-                1,
-                swap.path,
-                address(this),
-                block.timestamp
-            );
-    }
+    // function uniswapV2(
+    //     Swap memory swap,
+    //     uint256 amountIn
+    // ) internal returns (uint256[] memory) {
+    //     console.log("amountIn", amountIn);
+    //     approveToken(swap.path[0], swap.router, amountIn);
+    //     return
+    //         IUniswapV2Router02(swap.router).swapExactTokensForTokens(
+    //             amountIn,
+    //             1,
+    //             swap.path,
+    //             address(this),
+    //             block.timestamp
+    //         );
+    // }
 
-    function dodoSwap(Swap memory swap, uint256 amountIn) internal {
-        address fromToken = swap.path[0];
-        address toToken = swap.path[1];
-        address dodoV2Pool = swap.router;
+    // function dodoSwap(Swap memory swap, uint256 amountIn) internal {
+    //     address fromToken = swap.path[0];
+    //     address toToken = swap.path[1];
+    //     address dodoV2Pool = swap.router;
 
-        address[] memory dodoPairs = new address[](1); //one-hop
-        dodoPairs[0] = dodoV2Pool;
+    //     address[] memory dodoPairs = new address[](1); //one-hop
+    //     dodoPairs[0] = dodoV2Pool;
 
-        address baseToken = IDODO(dodoV2Pool)._BASE_TOKEN_();
+    //     address baseToken = IDODO(dodoV2Pool)._BASE_TOKEN_();
 
-        uint256 directions = baseToken == fromToken ? 0 : 1;
+    //     uint256 directions = baseToken == fromToken ? 0 : 1;
 
-        // pool address validation
-        if (directions == 0) {
-            require(
-                IDODO(dodoV2Pool)._QUOTE_TOKEN_() == toToken,
-                "Wrong dodo V2 pool address"
-            );
-        } else {
-            require(
-                IDODO(dodoV2Pool)._BASE_TOKEN_() == toToken,
-                "Wrong dodo V2 pool address"
-            );
-        }
+    //     // pool address validation
+    //     if (directions == 0) {
+    //         require(
+    //             IDODO(dodoV2Pool)._QUOTE_TOKEN_() == toToken,
+    //             "Wrong dodo V2 pool address"
+    //         );
+    //     } else {
+    //         require(
+    //             IDODO(dodoV2Pool)._BASE_TOKEN_() == toToken,
+    //             "Wrong dodo V2 pool address"
+    //         );
+    //     }
 
-        uint256 deadline = block.timestamp;
+    //     uint256 deadline = block.timestamp;
 
-        address dodoApprove = 0x6D310348d5c12009854DFCf72e0DF9027e8cb4f4;
-        approveToken(fromToken, dodoApprove, amountIn);
+    //     address dodoApprove = 0x6D310348d5c12009854DFCf72e0DF9027e8cb4f4;
+    //     approveToken(fromToken, dodoApprove, amountIn);
 
-        address dodoProxy = 0xa222e6a71D1A1Dd5F279805fbe38d5329C1d0e70;
+    //     address dodoProxy = 0xa222e6a71D1A1Dd5F279805fbe38d5329C1d0e70;
 
-        IDODOProxy(dodoProxy).dodoSwapV2TokenToToken(
-            fromToken,
-            toToken,
-            amountIn,
-            1,
-            dodoPairs,
-            directions,
-            false,
-            deadline
-        );
-    }
+    //     IDODOProxy(dodoProxy).dodoSwapV2TokenToToken(
+    //         fromToken,
+    //         toToken,
+    //         amountIn,
+    //         1,
+    //         dodoPairs,
+    //         directions,
+    //         false,
+    //         deadline
+    //     );
+    // }
 
     function approveToken(
         address token,
