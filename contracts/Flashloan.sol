@@ -16,7 +16,6 @@ import "./libraries/BytesLib.sol";
 import "./libraries/Part.sol";
 import "./libraries/RouteUtils.sol";
 
-import "hardhat/console.sol";
 
 contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
     using SafeMath for uint256;
@@ -82,7 +81,6 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
                 decoded.firstRoutes[i].part,
                 decoded.loanAmount
             );
-            console.log("callback amountIn", amountIn);
             routeTrade(decoded.firstRoutes[i], amountIn);
         }
 
@@ -93,7 +91,6 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
                 decoded.secondRoutes[i].part,
                 toTokenAmount
             );
-            console.log("amountIn", amountIn);
             routeTrade(decoded.secondRoutes[i], amountIn);
         }
 
@@ -118,7 +115,6 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
     function routeTrade(Route memory route, uint256 totalAmount) internal {
         uint256 amountIn = totalAmount;
         for (uint256 i = 0; i < route.hops.length; i++) {
-console.log("amountIn", amountIn);
             amountIn = hopTrade(route.hops[i], amountIn);
         }
     }
@@ -144,7 +140,6 @@ console.log("amountIn", amountIn);
         // checkRouteProtocol(swap)
         returns (uint256 amountOut)
     {
-console.log("pick protocol amountIn", amountIn);
 return uniswapV2(swap, path, amountIn)[1];
 
         // if (swap.protocol == 0) {
@@ -166,7 +161,6 @@ return uniswapV2(swap, path, amountIn)[1];
 //         ISwapRouter swapRouter = ISwapRouter(swap.router);
 //         approveToken(path[0], address(swapRouter), amountIn);
 
-// console.log("amountIn", amountIn);
 //             // single swaps
 //             amountOut = swapRouter.exactInputSingle(
 //                 ISwapRouter.ExactInputSingleParams({
@@ -208,7 +202,6 @@ return uniswapV2(swap, path, amountIn)[1];
         uint256 amountIn
     ) internal returns (uint256[] memory) {
 
-console.log("univ2 amountIn", amountIn);
         approveToken(path[0], swap.router, amountIn);
         return
             IUniswapV2Router02(swap.router).swapExactTokensForTokens(
