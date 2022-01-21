@@ -3,14 +3,18 @@ pragma solidity ^0.8.0;
 
 interface IFlashloan {
     struct Swap {
-        address[] path;
         uint8 protocol;
         uint16 part;
         address router;
     }
 
+    struct Hop {
+        Swap[] swaps;
+        address[] path;
+    }
+
     struct Route {
-        Swap[] swap;
+        Hop[] hops;
         uint16 part;
     }
 

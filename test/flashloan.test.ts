@@ -46,12 +46,16 @@ describe("Flashloan", () => {
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [
 						{
-							swap: [
+							hops: [
 								{
+									swaps: [
+										{
+											protocol: 1,
+											part: 10000,
+											router: uniswapRouter.POLYGON_QUICKSWAP,
+										}
+									],
 									path: [erc20Address.USDC, erc20Address.WETH],
-									protocol: 1,
-									part: 10000,
-									router: uniswapRouter.POLYGON_QUICKSWAP,
 								},
 							],
 							part: 10000,
@@ -59,72 +63,19 @@ describe("Flashloan", () => {
 					],
 					secondRoutes: [
 						{
-							swap: [
+							hops: [
 								{
+									swaps: [
+										{
+											protocol: 1,
+											part: 10000,
+											router: uniswapRouter.POLYGON_QUICKSWAP,
+										}
+									],
 									path: [erc20Address.WETH, erc20Address.USDC],
-									protocol: 1,
-									part: 10000,
-									router: uniswapRouter.POLYGON_QUICKSWAP,
 								},
 							],
 							part: 10000,
-						},
-					]
-				}, { gasLimit: 1000000 })
-			)
-				.emit(Flashloan, "SwapFinished")
-				.emit(Flashloan, "SentProfit");
-			const balance = await USDC.balanceOf(owner.address);
-			expect(balance.gt(getBigNumber(0))).to.be.true;
-		});
-
-		it("should execute uniswapV2 flashloan.", async () => {
-			await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6)
-			await expect(
-				Flashloan.dodoFlashLoan({
-					flashLoanPool: dodoV2Pool.WETH_USDC,
-					loanAmount: getBigNumber(1, 6),
-					firstRoutes: [
-						{
-							swap: [
-								{
-									path: [erc20Address.USDC, erc20Address.WETH],
-									protocol: 1,
-									part: 5000,
-									router: uniswapRouter.POLYGON_QUICKSWAP,
-								},
-								{
-									path: [erc20Address.USDC, erc20Address.WETH],
-									protocol: 1,
-									part: 5000,
-									router: uniswapRouter.POLYGON_SUSHISWAP,
-								},
-							],
-							part: 10000,
-						},
-					],
-					secondRoutes: [
-						{
-							swap: [
-								{
-									path: [erc20Address.WETH, erc20Address.USDC],
-									protocol: 1,
-									part: 10000,
-									router: uniswapRouter.POLYGON_QUICKSWAP,
-								},
-							],
-							part: 6000,
-						},
-						{
-							swap: [
-								{
-									path: [erc20Address.WETH, erc20Address.USDC],
-									protocol: 1,
-									part: 10000,
-									router: uniswapRouter.POLYGON_QUICKSWAP,
-								},
-							],
-							part: 4000,
 						},
 					]
 				}, { gasLimit: 1000000 })

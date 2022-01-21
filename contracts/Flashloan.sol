@@ -116,141 +116,153 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
     }
 
     function routeTrade(Route memory route, uint256 totalAmount) internal {
-        for (uint256 i = 0; i < route.swap.length; i++) {
+        uint256 amountIn = totalAmount;
+        for (uint256 i = 0; i < route.hops.length; i++) {
+console.log("amountIn", amountIn);
+            amountIn = hopTrade(route.hops[i], amountIn);
+        }
+    }
+
+    function hopTrade(Hop memory hop, uint256 totalAmount) internal returns (uint256) {
+        uint256 amountOut = 0;
+        for (uint256 i = 0; i < hop.swaps.length; i++) {
             uint256 amountIn = Part.partToAmountIn(
-                route.swap[i].part,
+                hop.swaps[i].part,
                 totalAmount
             );
-
-console.log("amountIn", amountIn);
-            pickProtocol(route.swap[i], amountIn);
+            amountOut += pickProtocol(hop.swaps[i], hop.path, amountIn);
         }
+        return amountOut;
     }
 
-    function pickProtocol(Swap memory swap, uint256 amountIn)
+    function pickProtocol(
+        Swap memory swap,
+        address[] memory path,
+     uint256 amountIn
+     )
         internal
         // checkRouteProtocol(swap)
+        returns (uint256 amountOut)
     {
-        if (swap.protocol == 0) {
-            // dodoSwap(swap, amountIn);
-        } else if (swap.protocol == 1) {
 console.log("pick protocol amountIn", amountIn);
-            uniswapV2(swap, amountIn);
-        } else if (swap.protocol == 2) {
-            uniswapV3(swap, amountIn);
-        }
+return uniswapV2(swap, path, amountIn)[1];
+
+        // if (swap.protocol == 0) {
+        //     // dodoSwap(swap, amountIn);
+        // } else if (swap.protocol == 1) {
+        //     uniswapV2(swap, amountIn);
+        // } else if (swap.protocol == 2) {
+        //     uniswapV3(swap, tokenIn, tokenOut, amountIn);
+        // }
     }
 
-    function uniswapV3(
-        Swap memory swap,
-        uint256 amountIn
-    ) internal 
-    // checkRouteUniswapV3(swap) 
-    returns (uint256 amountOut) {
-        address inputToken = swap.path[0];
+//     function uniswapV3(
+//         Swap memory swap,
+//         address[] memory path,
+//         uint256 amountIn
+//     ) internal 
+//     // checkRouteUniswapV3(swap) 
+//     returns (uint256 amountOut) {
+//         ISwapRouter swapRouter = ISwapRouter(swap.router);
+//         approveToken(path[0], address(swapRouter), amountIn);
 
-        ISwapRouter swapRouter = ISwapRouter(swap.router);
-        approveToken(inputToken, address(swapRouter), amountIn);
+// console.log("amountIn", amountIn);
+//             // single swaps
+//             amountOut = swapRouter.exactInputSingle(
+//                 ISwapRouter.ExactInputSingleParams({
+//                     tokenIn: tokenIn,
+//                     tokenOut: tokenOut,
+//                     // fee: swap.fee[0],
+//                     fee: 500,
+//                     recipient: address(this),
+//                     deadline: block.timestamp,
+//                     amountIn: amountIn,
+//                     amountOutMinimum: 0,
+//                     sqrtPriceLimitX96: 0
+//                 })
+//             );
+//         //     // multihop swaps
+//         //     bytes memory tokenFee = "";
+//         //     for (uint8 i = 0; i < swap.path.length - 1; i++) {
+//         //         tokenFee = tokenFee.merge(
+//         //             abi.encodePacked(swap.path[i], swap.fee[i])
+//         //         );
+//         //     }
 
-console.log("amountIn", amountIn);
-        if (swap.path.length == 2) {
-            // single swaps
-            amountOut = swapRouter.exactInputSingle(
-                ISwapRouter.ExactInputSingleParams({
-                    tokenIn: inputToken,
-                    tokenOut: swap.path[1],
-                    // fee: swap.fee[0],
-                    fee: 500,
-                    recipient: address(this),
-                    deadline: block.timestamp,
-                    amountIn: amountIn,
-                    amountOutMinimum: 0,
-                    sqrtPriceLimitX96: 0
-                })
-            );
-        // } else if (swap.path.length > 2) {
-        //     // multihop swaps
-        //     bytes memory tokenFee = "";
-        //     for (uint8 i = 0; i < swap.path.length - 1; i++) {
-        //         tokenFee = tokenFee.merge(
-        //             abi.encodePacked(swap.path[i], swap.fee[i])
-        //         );
-        //     }
-
-        //     amountOut = swapRouter.exactInput(
-        //         ISwapRouter.ExactInputParams({
-        //             path: tokenFee.merge(
-        //                 abi.encodePacked(swap.path[swap.path.length - 1])
-        //             ),
-        //             recipient: address(this),
-        //             deadline: block.timestamp,
-        //             amountIn: amountIn,
-        //             amountOutMinimum: 0
-        //         })
-        //     );
-        }
-    }
+//         //     amountOut = swapRouter.exactInput(
+//         //         ISwapRouter.ExactInputParams({
+//         //             path: tokenFee.merge(
+//         //                 abi.encodePacked(swap.path[swap.path.length - 1])
+//         //             ),
+//         //             recipient: address(this),
+//         //             deadline: block.timestamp,
+//         //             amountIn: amountIn,
+//         //             amountOutMinimum: 0
+//         //         })
+//         //     );
+//     }
 
     function uniswapV2(
         Swap memory swap,
+        address[] memory path,
         uint256 amountIn
     ) internal returns (uint256[] memory) {
 
 console.log("univ2 amountIn", amountIn);
-        approveToken(swap.path[0], swap.router, amountIn);
+        approveToken(path[0], swap.router, amountIn);
         return
             IUniswapV2Router02(swap.router).swapExactTokensForTokens(
                 amountIn,
                 1,
-                swap.path,
+                path,
                 address(this),
                 block.timestamp
             );
     }
 
-    function dodoSwap(Swap memory swap, uint256 amountIn) internal {
-        address fromToken = swap.path[0];
-        address toToken = swap.path[1];
-        address dodoV2Pool = swap.router;
+    // function dodoSwap(Swap memory swap, uint256 amountIn) internal {
+    //     address fromToken = swap.path[0];
+    //     address toToken = swap.path[1];
+    //     address dodoV2Pool = swap.router;
 
-        address[] memory dodoPairs = new address[](1); //one-hop
-        dodoPairs[0] = dodoV2Pool;
+    //     address[] memory dodoPairs = new address[](1); //one-hop
+    //     dodoPairs[0] = dodoV2Pool;
 
-        address baseToken = IDODO(dodoV2Pool)._BASE_TOKEN_();
+    //     address baseToken = IDODO(dodoV2Pool)._BASE_TOKEN_();
 
-        uint256 directions = baseToken == fromToken ? 0 : 1;
+    //     uint256 directions = baseToken == fromToken ? 0 : 1;
 
-        // pool address validation
-        if (directions == 0) {
-            require(
-                IDODO(dodoV2Pool)._QUOTE_TOKEN_() == toToken,
-                "Wrong dodo V2 pool address"
-            );
-        } else {
-            require(
-                IDODO(dodoV2Pool)._BASE_TOKEN_() == toToken,
-                "Wrong dodo V2 pool address"
-            );
-        }
+    //     // pool address validation
+    //     if (directions == 0) {
+    //         require(
+    //             IDODO(dodoV2Pool)._QUOTE_TOKEN_() == toToken,
+    //             "Wrong dodo V2 pool address"
+    //         );
+    //     } else {
+    //         require(
+    //             IDODO(dodoV2Pool)._BASE_TOKEN_() == toToken,
+    //             "Wrong dodo V2 pool address"
+    //         );
+    //     }
 
-        uint256 deadline = block.timestamp;
+    //     uint256 deadline = block.timestamp;
 
-        address dodoApprove = 0x6D310348d5c12009854DFCf72e0DF9027e8cb4f4;
-        approveToken(fromToken, dodoApprove, amountIn);
+    //     address dodoApprove = 0x6D310348d5c12009854DFCf72e0DF9027e8cb4f4;
+    //     approveToken(fromToken, dodoApprove, amountIn);
 
-        address dodoProxy = 0xa222e6a71D1A1Dd5F279805fbe38d5329C1d0e70;
+    //     address dodoProxy = 0xa222e6a71D1A1Dd5F279805fbe38d5329C1d0e70;
 
-        IDODOProxy(dodoProxy).dodoSwapV2TokenToToken(
-            fromToken,
-            toToken,
-            amountIn,
-            1,
-            dodoPairs,
-            directions,
-            false,
-            deadline
-        );
-    }
+    //     IDODOProxy(dodoProxy).dodoSwapV2TokenToToken(
+    //         fromToken,
+    //         toToken,
+    //         amountIn,
+    //         1,
+    //         dodoPairs,
+    //         directions,
+    //         false,
+    //         deadline
+    //     );
+    // }
 
     function approveToken(
         address token,

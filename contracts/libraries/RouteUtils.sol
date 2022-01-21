@@ -9,6 +9,7 @@ library RouteUtils {
         pure
         returns (address)
     {
-        return route.swap[0].path[0];
+        return route.hops[0].path[0];
     }
+
 }
