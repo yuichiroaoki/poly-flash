@@ -360,7 +360,7 @@ describe("Flashloan", () => {
                     path: [erc20Address.DAI, erc20Address.USDC],
                   },
                 ],
-                part: 10000,
+                part: 1000,
               },
             ],
           },
