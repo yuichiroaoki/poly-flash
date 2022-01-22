@@ -180,6 +180,10 @@ describe("Flashloan", () => {
         .emit(Flashloan, "SentProfit");
       const balance = await USDC.balanceOf(owner.address);
       expect(balance.gt(getBigNumber(0))).to.be.true;
+      expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to.be
+        .true;
+      expect((await WETH.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to
+        .be.true;
     });
   });
 
@@ -302,6 +306,8 @@ describe("Flashloan", () => {
         .emit(Flashloan, "SentProfit");
       const balance = await USDC.balanceOf(owner.address);
       expect(balance.gt(getBigNumber(0))).to.be.true;
+      expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to.be
+        .true;
     });
 
     it("should execute uniswapV3 flashloan with multiple routes.", async () => {
@@ -371,6 +377,8 @@ describe("Flashloan", () => {
         .emit(Flashloan, "SentProfit");
       const balance = await USDC.balanceOf(owner.address);
       expect(balance.gt(getBigNumber(0))).to.be.true;
+      expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to.be
+        .true;
     });
   });
 
