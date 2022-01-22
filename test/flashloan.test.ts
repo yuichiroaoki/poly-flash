@@ -184,18 +184,14 @@ describe("Flashloan", () => {
         .emit(Flashloan, "SentProfit");
       const balance = await USDC.balanceOf(owner.address);
       expect(balance.gt(getBigNumber(0))).to.be.true;
-      console.log(
-        "DAI",
-        ethers.utils.formatUnits(await DAI.balanceOf(Flashloan.address), 18)
-      );
-      console.log(
-        "WETH",
-        ethers.utils.formatUnits(await WETH.balanceOf(Flashloan.address), 18)
-      );
-      expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to.be
-        .true;
-      expect((await WETH.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to
-        .be.true;
+      expect(
+        (await DAI.balanceOf(Flashloan.address)).lt(ethers.BigNumber.from(1000))
+      ).to.be.true;
+      expect(
+        (await WETH.balanceOf(Flashloan.address)).lt(
+          ethers.BigNumber.from(1000)
+        )
+      ).to.be.true;
     });
   });
 
