@@ -35,7 +35,7 @@
     "dotenv": "^10.0.0",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.0.0",
-    "hardhat": "^2.3.3",
+    "hardhat": "^2.8.3",
     "husky": "^7.0.4",
     "lint-staged": "^12.2.2",
     "prettier": "2.4.1",
