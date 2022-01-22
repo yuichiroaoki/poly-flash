@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
-import { erc20Address, uniswapRouter } from "../constants/addresses";
+import { erc20Address, uniswapRouter, UniswapV3poolFee } from "../constants/addresses";
 import { Router, Router__factory } from "../typechain";
 
 describe("Router", () => {
@@ -19,11 +19,7 @@ describe("Router", () => {
     )) as Router__factory;
     Router = (await upgrades.deployProxy(factory, [
       Object.values(uniswapRouter),
-      [
-        {base: erc20Address.DAI, quote: erc20Address.USDC, fee: 500},
-        {base: erc20Address.DAI, quote: erc20Address.USDT, fee: 500},
-        {base: erc20Address.WMATIC, quote: erc20Address.USDC, fee: 500},
-      ]
+      UniswapV3poolFee
     ], {
       initializer: "initialize",
     })) as Router;
@@ -38,9 +34,9 @@ describe("Router", () => {
   it("should not update a pool fee.", async () => {
     expect(await Router.getFee(erc20Address.WMATIC, erc20Address.USDC)).to.eq(ethers.BigNumber.from(500));
     await expect(Router.connect(addr1).updateFee(erc20Address.WMATIC, erc20Address.USDC, 3000))
-    .to.be.revertedWith("Ownable: caller is not the owner");
+      .to.be.revertedWith("Ownable: caller is not the owner");
   });
-});
+  });
 
   it("should get a router address.", async () => {
     expect(await Router.getRouterAddress(1)).to.eq(uniswapRouter.POLYGON_QUICKSWAP);
