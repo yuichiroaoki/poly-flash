@@ -116,7 +116,7 @@ describe("Flashloan", () => {
       expect(balance.gt(getBigNumber(0))).to.be.true;
     });
 
-    it("should execute uniswapV2 flashloan.", async () => {
+    it("should execute a flashloan with multihop swaps.", async () => {
       await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
       await expect(
         Flashloan.dodoFlashLoan(
@@ -181,35 +181,10 @@ describe("Flashloan", () => {
       const balance = await USDC.balanceOf(owner.address);
       expect(balance.gt(getBigNumber(0))).to.be.true;
     });
-
-    // it("should execute flashloan with multihop swaps", async () => {
-    // 	await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
-    // 	await expect(
-    // 		Flashloan.dodoFlashLoan({
-    // 			flashLoanPool: dodoV2Pool.WETH_USDC,
-    // 			loanAmount: getBigNumber(1, 6),
-    // 			firstRoutes: [{
-    // 				path: [erc20Address.USDC, erc20Address.DAI, erc20Address.WETH],
-    // 				router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 				protocol: 1,
-    // 				fee: []
-    // 			}],
-    // 			secondRoutes: [{
-    // 				path: [erc20Address.WETH, erc20Address.DAI, erc20Address.USDT, erc20Address.USDC],
-    // 				router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 				protocol: 1,
-    // 				fee: []
-    // 			}]
-    // 		}, { gasLimit: 1000000 })
-    // 	)
-    // 		.emit(Flashloan, "SentProfit");
-    // 	const balance = await USDC.balanceOf(owner.address);
-    // 	expect(balance.gt(getBigNumber(0))).to.be.true;
-    // });
   });
 
   describe("UniswapV3", () => {
-    it("should execute uniswapV2 flashloan.", async () => {
+    it("should execute uniswapV3 flashloan.", async () => {
       await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
       await expect(
         Flashloan.dodoFlashLoan(
@@ -258,231 +233,145 @@ describe("Flashloan", () => {
       expect(balance.gt(getBigNumber(0))).to.be.true;
     });
 
-    // 	it("should execute flashloan and swap on uniswapV3.", async () => {
-    // 		await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
-    // 		await expect(
-    // 			Flashloan.dodoFlashLoan({
-    // 				flashLoanPool: dodoV2Pool.USDC_USDT,
-    // 				loanAmount: getBigNumber(1, 6),
-    // 				firstRoutes: [{
-    // 					path: [erc20Address.USDT, erc20Address.USDC],
-    // 					router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 					protocol: 2,
-    // 					fee: [500]
-    // 				}],
-    // 				secondRoutes: [{
-    // 					path: [erc20Address.USDC, erc20Address.USDT],
-    // 					router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 					protocol: 2,
-    // 					fee: [500]
-    // 				}]
-    // 			}, { gasLimit: 1000000 })
-    // 		)
-    // 			.emit(Flashloan, "SwapFinished")
-    // 			.emit(Flashloan, "SentProfit");
-    // 		const balance = await USDT.balanceOf(owner.address);
-    // 		expect(balance.gt(getBigNumber(0))).to.be.true;
-    // 	});
+    it("should execute uniswapV3 flashloan with multiple swaps.", async () => {
+      await impersonateFundErc20(
+        USDC,
+        USDC_WHALE,
+        Flashloan.address,
+        "1000.0",
+        6
+      );
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WETH_USDC,
+            loanAmount: getBigNumber(1000, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 5000,
+                      },
+                      {
+                        protocol: 1,
+                        part: 2500,
+                      },
+                      {
+                        protocol: 2,
+                        part: 1000,
+                      },
+                      {
+                        protocol: 3,
+                        part: 825,
+                      },
+                      {
+                        protocol: 4,
+                        part: 675,
+                      },
+                    ],
+                    path: [erc20Address.USDC, erc20Address.DAI],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                      },
+                    ],
+                    path: [erc20Address.DAI, erc20Address.USDC],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      )
+        .emit(Flashloan, "SwapFinished")
+        .emit(Flashloan, "SentProfit");
+      const balance = await USDC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(0))).to.be.true;
+    });
 
-    // 	it("should execute flashloan and swap on uniswapV3 multihop.", async () => {
-    // 		await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
-    // 		await expect(
-    // 			Flashloan.dodoFlashLoan({
-    // 				flashLoanPool: dodoV2Pool.USDC_USDT,
-    // 				loanAmount: getBigNumber(1, 6),
-    // 				firstRoutes: [{
-    // 					path: [erc20Address.USDT, erc20Address.USDC],
-    // 					router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 					protocol: 2,
-    // 					fee: [500]
-    // 				}],
-    // 				secondRoutes: [{
-    // 					path: [erc20Address.USDC, erc20Address.WMATIC, erc20Address.USDT],
-    // 					router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 					protocol: 2,
-    // 					fee: [3000, 500]
-    // 				}]
-    // 			}, { gasLimit: 1000000 })
-    // 		)
-    // 			.emit(Flashloan, "SwapFinished")
-    // 			.emit(Flashloan, "SentProfit");
-    // 		const balance = await USDT.balanceOf(owner.address);
-    // 		expect(balance.gt(getBigNumber(0))).to.be.true;
-    // 	});
-
-    // 	it("should execute flashloan and swap on uniswapV3 and dodo.", async () => {
-    // 		await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
-    // 		await expect(
-    // 			Flashloan.dodoFlashLoan({
-    // 				flashLoanPool: dodoV2Pool.USDC_USDT,
-    // 				loanAmount: getBigNumber(1, 6),
-    // 				firstRoutes: [{
-    // 					path: [erc20Address.USDT, erc20Address.USDC],
-    // 					router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 					protocol: 2,
-    // 					fee: [500]
-    // 				}],
-    // 				secondRoutes: [
-    // 					{
-    // 						path: [erc20Address.USDC, erc20Address.DAI],
-    // 						router: dodoV2Pool.USDC_DAI,
-    // 						protocol: 0,
-    // 						fee: []
-    // 					},
-    // 					{
-    // 						path: [erc20Address.DAI, erc20Address.USDT],
-    // 						router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 						protocol: 1,
-    // 						fee: []
-    // 					}
-    // 				]
-    // 			}, { gasLimit: 1000000 })
-    // 		)
-    // 			.emit(Flashloan, "SwapFinished")
-    // 			.emit(Flashloan, "SentProfit");
-    // 		const balance = await USDT.balanceOf(owner.address);
-    // 		expect(balance.gt(getBigNumber(0))).to.be.true;
-    // 	});
-
-    // 	it("should execute flashloan and swap on uniswapV3 and uniswapV2.", async () => {
-    // 		await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
-    // 		await expect(
-    // 			Flashloan.dodoFlashLoan({
-    // 				flashLoanPool: dodoV2Pool.USDC_USDT,
-    // 				loanAmount: getBigNumber(1, 6),
-    // 				firstRoutes: [{
-    // 					path: [erc20Address.USDT, erc20Address.USDC],
-    // 					router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 					protocol: 2,
-    // 					fee: [500]
-    // 				}],
-    // 				secondRoutes: [
-    // 					{
-    // 						path: [erc20Address.USDC, erc20Address.USDT],
-    // 						router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 						protocol: 1,
-    // 						fee: []
-    // 					}
-    // 				]
-    // 			}, { gasLimit: 1000000 })
-    // 		)
-    // 			.emit(Flashloan, "SwapFinished")
-    // 			.emit(Flashloan, "SentProfit");
-    // 		const balance = await USDT.balanceOf(owner.address);
-    // 		expect(balance.gt(getBigNumber(0))).to.be.true;
-    // 	});
-
-    // 	it("should execute flashloan and swap on uniswapV3 with two hops and uniswapV2.", async () => {
-    // 		await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
-    // 		await expect(
-    // 			Flashloan.dodoFlashLoan({
-    // 				flashLoanPool: dodoV2Pool.USDC_USDT,
-    // 				loanAmount: getBigNumber(1, 6),
-    // 				firstRoutes: [{
-    // 					path: [erc20Address.USDT, erc20Address.USDC, erc20Address.DAI],
-    // 					router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 					protocol: 2,
-    // 					fee: [500, 500]
-    // 				}],
-    // 				secondRoutes: [
-    // 					{
-    // 						path: [erc20Address.DAI, erc20Address.USDT],
-    // 						router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 						protocol: 1,
-    // 						fee: []
-    // 					}
-    // 				]
-    // 			}, { gasLimit: 1000000 })
-    // 		)
-    // 			.emit(Flashloan, "SwapFinished")
-    // 			.emit(Flashloan, "SentProfit");
-    // 		const balance = await USDT.balanceOf(owner.address);
-    // 		expect(balance.gt(getBigNumber(0))).to.be.true;
-    // 	});
-
-    // 	it("should execute flashloan and swap on uniswapV2 and uniswapV3 with two hops.", async () => {
-    // 		await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
-    // 		await expect(
-    // 			Flashloan.dodoFlashLoan({
-    // 				flashLoanPool: dodoV2Pool.USDC_USDT,
-    // 				loanAmount: getBigNumber(1, 6),
-    // 				firstRoutes: [{
-    // 					path: [erc20Address.USDT, erc20Address.DAI],
-    // 					router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 					protocol: 1,
-    // 					fee: []
-    // 				}],
-    // 				secondRoutes: [
-    // 					{
-    // 						path: [erc20Address.DAI, erc20Address.USDC, erc20Address.USDT],
-    // 						router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 						protocol: 2,
-    // 						fee: [500, 500]
-    // 					}
-    // 				]
-    // 			}, { gasLimit: 1000000 })
-    // 		)
-    // 			.emit(Flashloan, "SwapFinished")
-    // 			.emit(Flashloan, "SentProfit");
-    // 		const balance = await USDT.balanceOf(owner.address);
-    // 		expect(balance.gt(getBigNumber(0))).to.be.true;
-    // 	});
-
-    // 	it("should execute flashloan and swap on uniswapV3 with three hops and uniswapV2.", async () => {
-    // 		await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
-    // 		await expect(
-    // 			Flashloan.dodoFlashLoan({
-    // 				flashLoanPool: dodoV2Pool.USDC_USDT,
-    // 				loanAmount: getBigNumber(1, 6),
-    // 				firstRoutes: [{
-    // 					path: [erc20Address.USDT, erc20Address.USDC, erc20Address.WMATIC, erc20Address.DAI],
-    // 					router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 					protocol: 2,
-    // 					fee: [500, 500, 500]
-    // 				}],
-    // 				secondRoutes: [
-    // 					{
-    // 						path: [erc20Address.DAI, erc20Address.USDT],
-    // 						router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 						protocol: 1,
-    // 						fee: []
-    // 					}
-    // 				]
-    // 			}, { gasLimit: 1000000 })
-    // 		)
-    // 			.emit(Flashloan, "SwapFinished")
-    // 			.emit(Flashloan, "SentProfit");
-    // 		const balance = await USDT.balanceOf(owner.address);
-    // 		expect(balance.gt(getBigNumber(0))).to.be.true;
-    // 	});
-
-    // 	it("should execute flashloan and swap on uniswapV2 and uniswapV3 with three hops.", async () => {
-    // 		await impersonateFundErc20(USDT, WETH_WHALE, Flashloan.address, "1.0", 6)
-    // 		await expect(
-    // 			Flashloan.dodoFlashLoan({
-    // 				flashLoanPool: dodoV2Pool.USDC_USDT,
-    // 				loanAmount: getBigNumber(1, 6),
-    // 				firstRoutes: [{
-    // 					path: [erc20Address.USDT, erc20Address.DAI],
-    // 					router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 					protocol: 1,
-    // 					fee: []
-    // 				}],
-    // 				secondRoutes: [
-    // 					{
-    // 						path: [erc20Address.DAI, erc20Address.USDC, erc20Address.WMATIC, erc20Address.USDT],
-    // 						router: uniswapRouter.POLYGON_QUICKSWAP,
-    // 						protocol: 2,
-    // 						fee: [500, 500, 500]
-    // 					}
-    // 				]
-    // 			}, { gasLimit: 1000000 })
-    // 		)
-    // 			.emit(Flashloan, "SwapFinished")
-    // 			.emit(Flashloan, "SentProfit");
-    // 		const balance = await USDT.balanceOf(owner.address);
-    // 		expect(balance.gt(getBigNumber(0))).to.be.true;
-    // 	});
+    it("should execute uniswapV3 flashloan with multiple routes.", async () => {
+      await impersonateFundErc20(
+        USDC,
+        USDC_WHALE,
+        Flashloan.address,
+        "10.0",
+        6
+      );
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WETH_USDC,
+            loanAmount: getBigNumber(10, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 5000,
+                      },
+                    ],
+                    path: [erc20Address.USDC, erc20Address.DAI],
+                  },
+                ],
+                part: 9000,
+              },
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 1,
+                        part: 5000,
+                      },
+                    ],
+                    path: [erc20Address.USDC, erc20Address.DAI],
+                  },
+                ],
+                part: 1000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                      },
+                    ],
+                    path: [erc20Address.DAI, erc20Address.USDC],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      )
+        .emit(Flashloan, "SwapFinished")
+        .emit(Flashloan, "SentProfit");
+      const balance = await USDC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(0))).to.be.true;
+    });
   });
 
   // describe("DODO", () => {
