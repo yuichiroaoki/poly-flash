@@ -1,12 +1,13 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { ethers } from "hardhat";
-import { WETH_WHALE, dodoV2Pool, erc20Address, uniswapRouter, WMATIC_WHALE, USDC_WHALE } from "../constants/addresses";
-import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
+import { ethers, upgrades } from "hardhat";
+import { WETH_WHALE, dodoV2Pool, erc20Address, uniswapRouter, WMATIC_WHALE, USDC_WHALE, UniswapV3poolFee } from "../constants/addresses";
+import { ERC20Mock, Router, Flashloan, Flashloan__factory, Router__factory } from "../typechain";
 import { deployContractFromName, getBigNumber, getERC20ContractFromAddress } from "../utils";
 import { impersonateFundErc20 } from "../utils/token";
 
 describe("Flashloan", () => {
+	let Router: Router;
 	let Flashloan: Flashloan;
 	let owner: SignerWithAddress;
 	let addr1: SignerWithAddress;
@@ -24,14 +25,26 @@ describe("Flashloan", () => {
 		DAI = await getERC20ContractFromAddress(erc20Address.DAI)
 		WETH = await getERC20ContractFromAddress(erc20Address.WETH)
 		WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC)
+
+		const factory = (await ethers.getContractFactory(
+			"Router",
+			owner
+		)) as Router__factory;
+		Router = (await upgrades.deployProxy(factory, [
+			Object.values(uniswapRouter),
+			UniswapV3poolFee
+		], {
+			initializer: "initialize",
+		})) as Router;
+		await Router.deployed();
 	})
 
 	beforeEach(async () => {
 		[owner, addr1, addr2, ...addrs] = await ethers.getSigners();
-
 		Flashloan = await deployContractFromName(
 			"Flashloan",
-			Flashloan__factory
+			Flashloan__factory,
+			[Router.address]
 		);
 		await Flashloan.deployed();
 	});
@@ -45,21 +58,20 @@ describe("Flashloan", () => {
 					flashLoanPool: dodoV2Pool.WETH_USDC,
 					loanAmount: getBigNumber(1, 6),
 					firstRoutes: [
+		{
+			hops: [
+				{
+					swaps: [
 						{
-							hops: [
-								{
-									swaps: [
-										{
-											protocol: 1,
-											part: 10000,
-											router: uniswapRouter.POLYGON_QUICKSWAP,
-										}
-									],
-									path: [erc20Address.USDC, erc20Address.WETH],
-								},
-							],
+							protocol: 0,
 							part: 10000,
-						},
+						}
+					],
+					path: [erc20Address.USDC, erc20Address.WETH],
+				},
+			],
+			part: 10000,
+		},
 					],
 					secondRoutes: [
 						{
@@ -69,7 +81,6 @@ describe("Flashloan", () => {
 										{
 											protocol: 1,
 											part: 10000,
-											router: uniswapRouter.POLYGON_QUICKSWAP,
 										}
 									],
 									path: [erc20Address.WETH, erc20Address.USDC],
@@ -100,12 +111,10 @@ describe("Flashloan", () => {
 										{
 											protocol: 1,
 											part: 5000,
-											router: uniswapRouter.POLYGON_QUICKSWAP,
 										},
 										{
-											protocol: 1,
+											protocol: 0,
 											part: 5000,
-											router: uniswapRouter.POLYGON_SUSHISWAP,
 										},
 									],
 									path: [erc20Address.USDC, erc20Address.DAI],
@@ -113,14 +122,12 @@ describe("Flashloan", () => {
 								{
 									swaps: [
 										{
-											protocol: 1,
+											protocol: 2,
 											part: 9000,
-											router: uniswapRouter.POLYGON_QUICKSWAP,
 										},
 										{
-											protocol: 1,
+											protocol: 3,
 											part: 1000,
-											router: uniswapRouter.POLYGON_SUSHISWAP,
 										},
 									],
 									path: [erc20Address.DAI, erc20Address.WETH],
@@ -137,7 +144,6 @@ describe("Flashloan", () => {
 										{
 											protocol: 1,
 											part: 10000,
-											router: uniswapRouter.POLYGON_QUICKSWAP,
 										}
 									],
 									path: [erc20Address.WETH, erc20Address.USDC],

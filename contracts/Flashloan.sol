@@ -9,9 +9,13 @@ import "./uniswap/v3/ISwapRouter.sol";
 
 import "./dodo/IDODO.sol";
 import "./dodo/IDODOProxy.sol";
+
 import "./interfaces/IFlashloan.sol";
+import "./interfaces/IRouter.sol";
+
 import "./base/FlashloanValidation.sol";
 import "./base/DodoBase.sol";
+
 import "./libraries/BytesLib.sol";
 import "./libraries/Part.sol";
 import "./libraries/RouteUtils.sol";
@@ -24,6 +28,12 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
 
     event SentProfit(address recipient, uint256 profit);
     event SwapFinished(address token, uint256 amount);
+
+    IRouter uniswapRouter;
+
+    constructor(address _router) {
+        uniswapRouter = IRouter(_router);
+    }
 
     function dodoFlashLoan(FlashParams memory params)
         external
@@ -201,10 +211,10 @@ return uniswapV2(swap, path, amountIn)[1];
         address[] memory path,
         uint256 amountIn
     ) internal returns (uint256[] memory) {
-
-        approveToken(path[0], swap.router, amountIn);
+        address router = uniswapRouter.getRouterAddress(swap.protocol);
+        approveToken(path[0], router, amountIn);
         return
-            IUniswapV2Router02(swap.router).swapExactTokensForTokens(
+            IUniswapV2Router02(router).swapExactTokensForTokens(
                 amountIn,
                 1,
                 path,
