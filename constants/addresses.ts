@@ -49,9 +49,12 @@ interface PoolInfo {
 export const UniswapV3poolFee: PoolInfo[] = [
   { base: erc20Address.DAI, quote: erc20Address.USDC, fee: 500 },
   { base: erc20Address.DAI, quote: erc20Address.USDT, fee: 500 },
-  { base: erc20Address.DAI, quote: erc20Address.WETH, fee: 500 },
+  { base: erc20Address.DAI, quote: erc20Address.WETH, fee: 3000 },
   { base: erc20Address.DAI, quote: erc20Address.WMATIC, fee: 500 },
-  { base: erc20Address.WMATIC, quote: erc20Address.USDC, fee: 500 },
-  { base: erc20Address.WMATIC, quote: erc20Address.USDT, fee: 500 },
-  { base: erc20Address.WMATIC, quote: erc20Address.WETH, fee: 500 },
+  { base: erc20Address.USDC, quote: erc20Address.USDT, fee: 500 },
+  { base: erc20Address.USDC, quote: erc20Address.WETH, fee: 500 },
+  { base: erc20Address.USDC, quote: erc20Address.WMATIC, fee: 500 },
+  { base: erc20Address.USDT, quote: erc20Address.WETH, fee: 3000 },
+  { base: erc20Address.USDT, quote: erc20Address.WMATIC, fee: 500 },
+  { base: erc20Address.WETH, quote: erc20Address.WMATIC, fee: 500 },
 ];
