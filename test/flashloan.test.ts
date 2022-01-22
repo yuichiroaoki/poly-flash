@@ -118,6 +118,10 @@ describe("Flashloan", () => {
 
     it("should execute a flashloan with multihop swaps.", async () => {
       await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
+      expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to.be
+        .true;
+      expect((await WETH.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to
+        .be.true;
       await expect(
         Flashloan.dodoFlashLoan(
           {
@@ -180,6 +184,14 @@ describe("Flashloan", () => {
         .emit(Flashloan, "SentProfit");
       const balance = await USDC.balanceOf(owner.address);
       expect(balance.gt(getBigNumber(0))).to.be.true;
+      console.log(
+        "DAI",
+        ethers.utils.formatUnits(await DAI.balanceOf(Flashloan.address), 18)
+      );
+      console.log(
+        "WETH",
+        ethers.utils.formatUnits(await WETH.balanceOf(Flashloan.address), 18)
+      );
       expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to.be
         .true;
       expect((await WETH.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to
@@ -330,7 +342,7 @@ describe("Flashloan", () => {
                     swaps: [
                       {
                         protocol: 0,
-                        part: 5000,
+                        part: 10000,
                       },
                     ],
                     path: [erc20Address.USDC, erc20Address.DAI],
@@ -344,7 +356,7 @@ describe("Flashloan", () => {
                     swaps: [
                       {
                         protocol: 1,
-                        part: 5000,
+                        part: 10000,
                       },
                     ],
                     path: [erc20Address.USDC, erc20Address.DAI],
@@ -366,7 +378,7 @@ describe("Flashloan", () => {
                     path: [erc20Address.DAI, erc20Address.USDC],
                   },
                 ],
-                part: 1000,
+                part: 10000,
               },
             ],
           },
