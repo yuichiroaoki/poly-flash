@@ -15,9 +15,10 @@
     "deploy": "npx hardhat run scripts/deploy.ts",
     "test": "npx hardhat test",
     "coverage": "npx hardhat coverage",
-    "account": "npx hardhat accounts",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "postinstall": "husky install"
   },
+  "private": true,
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.2",
@@ -35,8 +36,8 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.0.0",
     "hardhat": "^2.3.3",
-    "husky": "^7.0.2",
-    "lint-staged": "^11.1.2",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.2.2",
     "prettier": "2.4.1",
     "prettier-plugin-solidity": "^1.0.0-beta.18",
     "solidity-coverage": "^0.7.16",
