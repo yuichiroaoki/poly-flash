@@ -2,9 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "./base/FlashloanValidation.sol";
 
-contract Router is OwnableUpgradeable, FlashloanValidation {
+contract Router is OwnableUpgradeable {
     address[] public routers;
 
     struct PoolInfo {
@@ -30,10 +29,15 @@ contract Router is OwnableUpgradeable, FlashloanValidation {
         }
     }
 
+    modifier checkRouteProtocol(uint8 routerIdx) {
+        require(routerIdx < routers.length, "Wrong protocol");
+        _;
+    }
+
     function getRouterAddress(uint8 routerIdx)
         external
         view
-        checkRouteProtocol(routers, routerIdx)
+        checkRouteProtocol(routerIdx)
         returns (address)
     {
         return routers[routerIdx];

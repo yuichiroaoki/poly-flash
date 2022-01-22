@@ -13,11 +13,12 @@ import "./interfaces/IFlashloan.sol";
 import "./interfaces/IRouter.sol";
 
 import "./base/DodoBase.sol";
+import "./base/FlashloanValidation.sol";
 
 import "./libraries/Part.sol";
 import "./libraries/RouteUtils.sol";
 
-contract Flashloan is IFlashloan, DodoBase {
+contract Flashloan is IFlashloan, DodoBase, FlashloanValidation {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -120,6 +121,7 @@ contract Flashloan is IFlashloan, DodoBase {
 
     function hopTrade(Hop memory hop, uint256 totalAmount)
         internal
+        checkTotalPart(hop.swaps)
         returns (uint256)
     {
         uint256 amountOut = 0;
