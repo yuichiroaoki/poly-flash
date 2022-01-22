@@ -31,11 +31,28 @@ export const dodoV2Pool: PoolMap = {
 type RouterMap = { [protocol: string]: string };
 
 export const uniswapRouter: RouterMap = {
-  POLYGON_SUSHISWAP: "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
-  POLYGON_QUICKSWAP: "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff",
-  POLYGON_JETSWAP: "0x5C6EC38fb0e2609672BDf628B1fD605A523E5923",
-  POLYGON_POLYCAT: "0x94930a328162957FF1dd48900aF67B5439336cBD",
-  POLYGON_APESWAP: "0xC0788A3aD43d79aa53B09c2EaCc313A787d1d607",
-  POLYGON_WAULTSWAP: "0x3a1D87f206D12415f5b0A33E786967680AAb4f6d",
-  POLYGON_UNISWAP_V3: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+	POLYGON_SUSHISWAP: "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
+	POLYGON_QUICKSWAP: "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff",
+	POLYGON_JETSWAP: "0x5C6EC38fb0e2609672BDf628B1fD605A523E5923",
+	POLYGON_POLYCAT: "0x94930a328162957FF1dd48900aF67B5439336cBD",
+	POLYGON_APESWAP: "0xC0788A3aD43d79aa53B09c2EaCc313A787d1d607",
+	POLYGON_WAULTSWAP: "0x3a1D87f206D12415f5b0A33E786967680AAb4f6d",
+	POLYGON_UNISWAP_V3: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
 };
+
+
+interface PoolInfo {
+	base: string;
+	quote: string;
+	fee: number;
+}
+
+export const UniswapV3poolFee: PoolInfo[] = [
+	{ base: erc20Address.DAI, quote: erc20Address.USDC, fee: 500 },
+	{ base: erc20Address.DAI, quote: erc20Address.USDT, fee: 500 },
+	{ base: erc20Address.DAI, quote: erc20Address.WETH, fee: 500 },
+	{ base: erc20Address.DAI, quote: erc20Address.WMATIC, fee: 500 },
+	{ base: erc20Address.WMATIC, quote: erc20Address.USDC, fee: 500 },
+	{ base: erc20Address.WMATIC, quote: erc20Address.USDT, fee: 500 },
+	{ base: erc20Address.WMATIC, quote: erc20Address.WETH, fee: 500 },
+]
