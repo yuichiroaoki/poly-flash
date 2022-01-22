@@ -47,23 +47,17 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
                 secondRoutes: params.secondRoutes
             })
         );
-
         address loanToken = RouteUtils.getInitialToken(params.firstRoutes[0]);
-        if (IDODO(params.flashLoanPool)._BASE_TOKEN_() == loanToken) {
-            IDODO(params.flashLoanPool).flashLoan(
-                params.loanAmount,
-                0,
-                address(this),
-                data
-            );
-        } else if (IDODO(params.flashLoanPool)._QUOTE_TOKEN_() == loanToken) {
-            IDODO(params.flashLoanPool).flashLoan(
-                0,
-                params.loanAmount,
-                address(this),
-                data
-            );
-        }
+        IDODO(params.flashLoanPool).flashLoan(
+            IDODO(params.flashLoanPool)._BASE_TOKEN_() == loanToken
+                ? params.loanAmount
+                : 0,
+            IDODO(params.flashLoanPool)._BASE_TOKEN_() == loanToken
+                ? 0
+                : params.loanAmount,
+            address(this),
+            data
+        );
     }
 
     function _flashLoanCallBack(
