@@ -112,6 +112,112 @@ describe("Flashloan Error Message", () => {
       ).to.be.revertedWith("Wrong flashloan pool address");
     });
 
+    it("should revert flashloan with the total route parts error.", async () => {
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WMATIC_WETH,
+            loanAmount: getBigNumber(1, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 1,
+                        part: 10000,
+                      },
+                    ],
+                    path: [erc20Address.WMATIC, erc20Address.DAI],
+                  },
+                ],
+                part: 10000,
+              },
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 1,
+                        part: 10000,
+                      },
+                    ],
+                    path: [erc20Address.DAI, erc20Address.USDC],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 1,
+                        part: 10000,
+                      },
+                    ],
+                    path: [erc20Address.USDC, erc20Address.WMATIC],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      ).to.be.revertedWith("Route part error");
+    });
+
+    it("should revert flashloan with the total route parts error.", async () => {
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WMATIC_WETH,
+            loanAmount: getBigNumber(1, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 1,
+                        part: 10000,
+                      },
+                      {
+                        protocol: 2,
+                        part: 10000,
+                      },
+                    ],
+                    path: [erc20Address.WMATIC, erc20Address.DAI],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 1,
+                        part: 10000,
+                      },
+                    ],
+                    path: [erc20Address.DAI, erc20Address.WMATIC],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      ).to.be.revertedWith("Swap part error");
+    });
+
     // it("should revert flashloan when you borrow and swap tokens from the same pool.", async () => {
     // 	await expect(
     // 		Flashloan.dodoFlashLoan({

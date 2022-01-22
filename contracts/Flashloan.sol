@@ -76,23 +76,9 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation {
             "Failed to borrow loan token"
         );
 
-        for (uint256 i = 0; i < decoded.firstRoutes.length; i++) {
-            uint256 amountIn = Part.partToAmountIn(
-                decoded.firstRoutes[i].part,
-                decoded.loanAmount
-            );
-            routeTrade(decoded.firstRoutes[i], amountIn);
-        }
-
+        routeLoop(decoded.firstRoutes, decoded.loanAmount);
         uint256 toTokenAmount = IERC20(toToken).balanceOf(address(this));
-
-        for (uint256 i = 0; i < decoded.secondRoutes.length; i++) {
-            uint256 amountIn = Part.partToAmountIn(
-                decoded.secondRoutes[i].part,
-                toTokenAmount
-            );
-            routeTrade(decoded.secondRoutes[i], amountIn);
-        }
+        routeLoop(decoded.secondRoutes, toTokenAmount);
 
         emit SwapFinished(
             loanToken,
@@ -112,16 +98,26 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation {
         emit SentProfit(decoded.me, remained);
     }
 
-    function routeTrade(Route memory route, uint256 totalAmount) internal {
-        uint256 amountIn = totalAmount;
-        for (uint256 i = 0; i < route.hops.length; i++) {
-            amountIn = hopTrade(route.hops[i], amountIn);
+    function routeLoop(Route[] memory routes, uint256 totalAmount)
+        internal
+        checkTotalRoutePart(routes)
+    {
+        for (uint256 i = 0; i < routes.length; i++) {
+            uint256 amountIn = Part.partToAmountIn(routes[i].part, totalAmount);
+            hopLoop(routes[i], amountIn);
         }
     }
 
-    function hopTrade(Hop memory hop, uint256 totalAmount)
+    function hopLoop(Route memory route, uint256 totalAmount) internal {
+        uint256 amountIn = totalAmount;
+        for (uint256 i = 0; i < route.hops.length; i++) {
+            amountIn = swapLoop(route.hops[i], amountIn);
+        }
+    }
+
+    function swapLoop(Hop memory hop, uint256 totalAmount)
         internal
-        checkTotalPart(hop.swaps)
+        checkTotalSwapPart(hop.swaps)
         returns (uint256)
     {
         uint256 amountOut = 0;
