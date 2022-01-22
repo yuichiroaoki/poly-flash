@@ -13,14 +13,13 @@ import "./dodo/IDODOProxy.sol";
 import "./interfaces/IFlashloan.sol";
 import "./interfaces/IRouter.sol";
 
-import "./base/FlashloanValidation.sol";
 import "./base/DodoBase.sol";
 
 import "./libraries/BytesLib.sol";
 import "./libraries/Part.sol";
 import "./libraries/RouteUtils.sol";
 
-contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
+contract Flashloan is IFlashloan, DodoBase {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using BytesLib for bytes;
@@ -141,13 +140,7 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
         Swap memory swap,
         address[] memory path,
         uint256 amountIn
-    )
-        internal
-        returns (
-            // checkRouteProtocol(swap)
-            uint256 amountOut
-        )
-    {
+    ) internal returns (uint256 amountOut) {
         if (swap.protocol == 0) {
             // dodoSwap(swap, amountIn);
             return uniswapV3(swap, path, amountIn);

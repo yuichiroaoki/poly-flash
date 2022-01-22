@@ -2,8 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "./base/FlashloanValidation.sol";
 
-contract Router is OwnableUpgradeable {
+contract Router is OwnableUpgradeable, FlashloanValidation {
     address[] public routers;
 
     struct PoolInfo {
@@ -29,7 +30,12 @@ contract Router is OwnableUpgradeable {
         }
     }
 
-    function getRouterAddress(uint8 routerIdx) external view returns (address) {
+    function getRouterAddress(uint8 routerIdx)
+        external
+        view
+        checkRouteProtocol(routers, routerIdx)
+        returns (address)
+    {
         return routers[routerIdx];
     }
 
@@ -48,7 +54,8 @@ contract Router is OwnableUpgradeable {
                 return pools[i].fee;
             }
         }
-        return 0;
+        // set default as 0.3%
+        return 3000;
     }
 
     function sortTokenPair(address token1, address token2)
