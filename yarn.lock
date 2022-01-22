@@ -12,12 +12,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cspotcode/source-map-support@npm:0.6.1":
-  version: 0.6.1
-  resolution: "@cspotcode/source-map-support@npm:0.6.1"
+"@cspotcode/source-map-support@npm:0.7.0":
+  version: 0.7.0
+  resolution: "@cspotcode/source-map-support@npm:0.7.0"
   dependencies:
     "@cspotcode/source-map-consumer": 0.8.0
-  checksum: da9fb4f6404ebd210537bfa8b2821a747407bf422d2d3d46f29bf85c7c3a68a126de1a9ec41398d57ca116c3bef56d58c2fb4def0800630b1ec82533ad2447c2
+  checksum: 9faddda7757cd778b5fd6812137b2cc265810043680d6399acc20441668fafcdc874053be9dccd0d9110087287bfad27eb3bf342f72bceca9aa9059f5d0c4be8
   languageName: node
   linkType: hard
 
@@ -1088,10 +1088,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:*, @types/chai@npm:^4.2.18":
+"@types/chai@npm:*":
   version: 4.2.21
   resolution: "@types/chai@npm:4.2.21"
   checksum: dbd852dfea5065c2e86059bdc011c42a380c43bbcf80d427da228dc2a9e1efae27e7baf16570a3158571d92c206782e07fab3b703c28452a75a74380b33d1443
+  languageName: node
+  linkType: hard
+
+"@types/chai@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "@types/chai@npm:4.3.0"
+  checksum: 3e393e094263db65df28a0123dc13f342937c1bab6cd173eae913d593c5b9a16b555713a08c34863a1fbf079aa7222b96197c70380a5c130549d6b2f6845a989
   languageName: node
   linkType: hard
 
@@ -1155,10 +1162,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mocha@npm:^8.2.2":
-  version: 8.2.3
-  resolution: "@types/mocha@npm:8.2.3"
-  checksum: b43ed1b642a2ee62bf10792a07d5d21d66ab8b4d2cf5d822c8a7643e77b90009aecc000eefab5f6ddc9eb69004192f84119a6f97a8499e1a13ea082e7a5e71bf
+"@types/mocha@npm:^9.1.0":
+  version: 9.1.0
+  resolution: "@types/mocha@npm:9.1.0"
+  checksum: 21e1000dafcfe387c6812be41c44a47b48c27a74d5a70c3d5ef1bb5c88eadadfc74dba06e93f160e7248c8a57b3977b590f82504c801c9927816ecd4668023c0
   languageName: node
   linkType: hard
 
@@ -1186,10 +1193,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^15.12.2":
-  version: 15.14.9
-  resolution: "@types/node@npm:15.14.9"
-  checksum: 49f7f0522a3af4b8389aee660e88426490cd54b86356672a1fedb49919a8797c00d090ec2dcc4a5df34edc2099d57fc2203d796c4e7fbd382f2022ccd789eee7
+"@types/node@npm:^17.0.10":
+  version: 17.0.10
+  resolution: "@types/node@npm:17.0.10"
+  checksum: 979e83d642a2b4f18fa1a4233f884822c05abc7acd0836024aa964187f8446432b21f7913e72fe2b3927c4a811c27a0b6cd60ac7c4ac6a6762cfbab70782aa6a
   languageName: node
   linkType: hard
 
@@ -10977,11 +10984,11 @@ resolve@1.17.0:
   languageName: node
   linkType: hard
 
-"ts-node@npm:^10.0.0":
-  version: 10.2.1
-  resolution: "ts-node@npm:10.2.1"
+"ts-node@npm:^10.4.0":
+  version: 10.4.0
+  resolution: "ts-node@npm:10.4.0"
   dependencies:
-    "@cspotcode/source-map-support": 0.6.1
+    "@cspotcode/source-map-support": 0.7.0
     "@tsconfig/node10": ^1.0.7
     "@tsconfig/node12": ^1.0.7
     "@tsconfig/node14": ^1.0.0
@@ -11009,7 +11016,7 @@ resolve@1.17.0:
     ts-node-script: dist/bin-script.js
     ts-node-transpile-only: dist/bin-transpile.js
     ts-script: dist/bin-script-deprecated.js
-  checksum: f37d2827a583c51d012cdd3d9b96629fba7a5b5dfad2c26ca48c7c89f904118924689ca56f4b9b2136217194870a76f26aae06e3490ee613b0e960f02dc96bbe
+  checksum: 3933ac0a937d33c45e04a6750fcdd3e765eb2897d1da1307cd97ac52af093bcfb632ec0453a75000a65c8b5b7bdb32b1077050a186dcc556e62657cb592e6d49
   languageName: node
   linkType: hard
 
@@ -11183,9 +11190,9 @@ resolve@1.17.0:
     "@openzeppelin/hardhat-upgrades": ^1.10.0
     "@typechain/ethers-v5": ^7.0.1
     "@typechain/hardhat": ^2.1.2
-    "@types/chai": ^4.2.18
-    "@types/mocha": ^8.2.2
-    "@types/node": ^15.12.2
+    "@types/chai": ^4.3.0
+    "@types/mocha": ^9.1.0
+    "@types/node": ^17.0.10
     chai: ^4.3.4
     dotenv: ^10.0.0
     ethereum-waffle: ^3.4.0
@@ -11196,29 +11203,29 @@ resolve@1.17.0:
     prettier-plugin-solidity: ^1.0.0-beta.18
     solidity-coverage: ^0.7.16
     ts-generator: ^0.1.1
-    ts-node: ^10.0.0
+    ts-node: ^10.4.0
     typechain: ^5.1.1
-    typescript: ^4.3.2
+    typescript: ^4.5.5
   languageName: unknown
   linkType: soft
 
-typescript@^4.3.2:
-  version: 4.4.3
-  resolution: "typescript@npm:4.4.3"
+"typescript@npm:^4.5.5":
+  version: 4.5.5
+  resolution: "typescript@npm:4.5.5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 05823f21796d450531a7e4ab299715d38fd9ded0e4ce7400876053f4b5166ca3dde7a68cecfe72d9086039f03c0b6edba36516fb10ed83c5837d9600532ea4c2
+  checksum: 506f4c919dc8aeaafa92068c997f1d213b9df4d9756d0fae1a1e7ab66b585ab3498050e236113a1c9e57ee08c21ec6814ca7a7f61378c058d79af50a4b1f5a5e
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.3.2#~builtin<compat/typescript>":
-  version: 4.4.3
-  resolution: "typescript@patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=493e53"
+"typescript@patch:typescript@^4.5.5#~builtin<compat/typescript>":
+  version: 4.5.5
+  resolution: "typescript@patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 79f5c13d21c9dea3eb44d2b7002ff25a0569fefc432e083d65a360e3aca990aca25fc733e14aa6883b5e9a68e3e2f0330a34123e048806f91d701732ece00e6f
+  checksum: c05c318d79c690f101d7ffb34cd6c7d6bbd884d3af9cefe7749ad0cd6be43c7082f098280982ca945dcba23fde34a08fed9602bb26540936baf8c0520727d3ba
   languageName: node
   linkType: hard
 
