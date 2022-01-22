@@ -20,7 +20,6 @@ import "./libraries/BytesLib.sol";
 import "./libraries/Part.sol";
 import "./libraries/RouteUtils.sol";
 
-
 contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
@@ -129,7 +128,10 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
         }
     }
 
-    function hopTrade(Hop memory hop, uint256 totalAmount) internal returns (uint256) {
+    function hopTrade(Hop memory hop, uint256 totalAmount)
+        internal
+        returns (uint256)
+    {
         uint256 amountOut = 0;
         for (uint256 i = 0; i < hop.swaps.length; i++) {
             uint256 amountIn = Part.partToAmountIn(
@@ -144,67 +146,71 @@ contract Flashloan is IFlashloan, FlashloanValidation, DodoBase {
     function pickProtocol(
         Swap memory swap,
         address[] memory path,
-     uint256 amountIn
-     )
+        uint256 amountIn
+    )
         internal
-        // checkRouteProtocol(swap)
-        returns (uint256 amountOut)
+        returns (
+            // checkRouteProtocol(swap)
+            uint256 amountOut
+        )
     {
-return uniswapV2(swap, path, amountIn)[1];
-
-        // if (swap.protocol == 0) {
-        //     // dodoSwap(swap, amountIn);
-        // } else if (swap.protocol == 1) {
-        //     uniswapV2(swap, amountIn);
-        // } else if (swap.protocol == 2) {
-        //     uniswapV3(swap, tokenIn, tokenOut, amountIn);
-        // }
+        if (swap.protocol == 0) {
+            // dodoSwap(swap, amountIn);
+            return uniswapV3(swap, path, amountIn);
+        } else {
+            return uniswapV2(swap, path, amountIn)[1];
+        }
     }
 
-//     function uniswapV3(
-//         Swap memory swap,
-//         address[] memory path,
-//         uint256 amountIn
-//     ) internal 
-//     // checkRouteUniswapV3(swap) 
-//     returns (uint256 amountOut) {
-//         ISwapRouter swapRouter = ISwapRouter(swap.router);
-//         approveToken(path[0], address(swapRouter), amountIn);
+    function uniswapV3(
+        Swap memory swap,
+        address[] memory path,
+        uint256 amountIn
+    )
+        internal
+        returns (
+            // checkRouteUniswapV3(swap)
+            uint256 amountOut
+        )
+    {
+        address router = uniswapRouter.getRouterAddress(swap.protocol);
+        ISwapRouter swapRouter = ISwapRouter(router);
+        approveToken(path[0], address(swapRouter), amountIn);
+        uint24 fee = uniswapRouter.getFee(path[0], path[1]);
 
-//             // single swaps
-//             amountOut = swapRouter.exactInputSingle(
-//                 ISwapRouter.ExactInputSingleParams({
-//                     tokenIn: tokenIn,
-//                     tokenOut: tokenOut,
-//                     // fee: swap.fee[0],
-//                     fee: 500,
-//                     recipient: address(this),
-//                     deadline: block.timestamp,
-//                     amountIn: amountIn,
-//                     amountOutMinimum: 0,
-//                     sqrtPriceLimitX96: 0
-//                 })
-//             );
-//         //     // multihop swaps
-//         //     bytes memory tokenFee = "";
-//         //     for (uint8 i = 0; i < swap.path.length - 1; i++) {
-//         //         tokenFee = tokenFee.merge(
-//         //             abi.encodePacked(swap.path[i], swap.fee[i])
-//         //         );
-//         //     }
+        // single swaps
+        amountOut = swapRouter.exactInputSingle(
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: path[0],
+                tokenOut: path[1],
+                fee: fee,
+                recipient: address(this),
+                deadline: block.timestamp,
+                amountIn: amountIn,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            })
+        );
+        //     // multihop swaps
+        //     bytes memory tokenFee = "";
+        //     for (uint8 i = 0; i < swap.path.length - 1; i++) {
+        //         tokenFee = tokenFee.merge(
+        //             abi.encodePacked(swap.path[i], swap.fee[i])
+        //         );
+        //     }
 
-//         //     amountOut = swapRouter.exactInput(
-//         //         ISwapRouter.ExactInputParams({
-//         //             path: tokenFee.merge(
-//         //                 abi.encodePacked(swap.path[swap.path.length - 1])
-//         //             ),
-//         //             recipient: address(this),
-//         //             deadline: block.timestamp,
-//         //             amountIn: amountIn,
-//         //             amountOutMinimum: 0
-//         //         })
-//         //     );
-//     }
+        //     amountOut = swapRouter.exactInput(
+        //         ISwapRouter.ExactInputParams({
+        //             path: tokenFee.merge(
+        //                 abi.encodePacked(swap.path[swap.path.length - 1])
+        //             ),
+        //             recipient: address(this),
+        //             deadline: block.timestamp,
+        //             amountIn: amountIn,
+        //             amountOutMinimum: 0
+        //         })
+        //     );
+    }
 
     function uniswapV2(
         Swap memory swap,
