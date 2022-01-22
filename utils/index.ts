@@ -15,7 +15,7 @@ export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 export const deployContractFromName = async (
   contractName: string,
   factoryType: any,
-  ...args: Array<any>
+  args: Array<any> = []
 ) => {
   const factory = (await ethers.getContractFactory(contractName)) as typeof factoryType
   return factory.deploy(...args)
