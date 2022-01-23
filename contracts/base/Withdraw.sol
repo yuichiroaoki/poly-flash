@@ -13,6 +13,7 @@ contract Withdraw is Ownable, ReentrancyGuard {
         address _to,
         uint256 _value
     ) public onlyOwner nonReentrant {
+        require(token.balanceOf(address(this)) >= _value, "Not enough token");
         SafeERC20.safeTransfer(token, _to, _value);
         emit Withdrawal(_to, _value);
     }

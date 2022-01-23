@@ -14,11 +14,12 @@ import "./interfaces/IRouter.sol";
 
 import "./base/DodoBase.sol";
 import "./base/FlashloanValidation.sol";
+import "./base/Withdraw.sol";
 
 import "./libraries/Part.sol";
 import "./libraries/RouteUtils.sol";
 
-contract Flashloan is IFlashloan, DodoBase, FlashloanValidation {
+contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 

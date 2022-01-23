@@ -487,4 +487,42 @@ describe("Flashloan", () => {
   // 	});
 
   // });
+
+  describe("Withdraw", () => {
+    it("should withdraw tokens", async () => {
+      await impersonateFundErc20(USDC, USDC_WHALE, owner.address, "1.0", 6);
+
+      await Flashloan.withdrawToken(
+        USDC.address,
+        addr1.address,
+        getBigNumber(1, 6)
+      );
+      const balance = await USDC.balanceOf(addr1.address);
+      expect(balance.eq(getBigNumber(1, 6))).to.be.true;
+    });
+
+    it("should be reverted when there's not enough tokens.", async () => {
+      await impersonateFundErc20(USDC, USDC_WHALE, owner.address, "1.0", 6);
+
+      await expect(
+        Flashloan.withdrawToken(
+          USDC.address,
+          addr1.address,
+          getBigNumber(10, 6)
+        )
+      ).to.be.revertedWith("Not enough balance");
+    });
+
+    it("should be reverted when non-owner call withdrawToken function", async () => {
+      await impersonateFundErc20(USDC, USDC_WHALE, owner.address, "1.0", 6);
+
+      await expect(
+        Flashloan.withdrawToken(
+          USDC.address,
+          addr1.address,
+          getBigNumber(10, 6)
+        )
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+  });
 });
