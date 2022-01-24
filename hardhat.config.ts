@@ -29,14 +29,14 @@ const configForTest = {
     hardhat: {
       forking: {
         url: process.env.ALCHEMY_POLYGON_RPC_URL,
-        blockNumber: 23632277
-      }
+        blockNumber: 24084860,
+      },
     },
   },
   mocha: {
-    timeout: 200000
-  }
-}
+    timeout: 200000,
+  },
+};
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -51,8 +51,8 @@ const configLocal = {
             enabled: true,
             runs: 200,
             details: {
-              yul: false
-            }
+              yul: false,
+            },
           },
         },
       },
@@ -65,20 +65,20 @@ const configLocal = {
     hardhat: {
       forking: {
         url: process.env.ALCHEMY_POLYGON_RPC_URL,
-        blockNumber: 24084860
-      }
+        blockNumber: 24084860,
+      },
     },
     polygon: {
       url: process.env.ALCHEMY_POLYGON_RPC_URL,
-      accounts: [process.env.PRIVATE_KEY]
+      accounts: [process.env.PRIVATE_KEY],
     },
   },
   etherscan: {
-    apiKey: process.env.POLYSCAN_APIKEY
+    apiKey: process.env.POLYSCAN_APIKEY,
   },
   mocha: {
-    timeout: 200000
-  }
-}
+    timeout: 200000,
+  },
+};
 
 module.exports = process.env.PRIVATE_KEY ? configLocal : configForTest;
