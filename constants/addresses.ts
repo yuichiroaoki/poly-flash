@@ -58,3 +58,9 @@ export const UniswapV3poolFee: PoolInfo[] = [
   { base: erc20Address.USDT, quote: erc20Address.WMATIC, fee: 500 },
   { base: erc20Address.WETH, quote: erc20Address.WMATIC, fee: 500 },
 ];
+
+/**
+ * deployed Router contract address
+ * https://polygonscan.com/address/0x112aae1218e91392293cb3e63d4f9e7c9c376d2c
+ */
+export const routerAddress = "0x112Aae1218E91392293cb3E63d4f9E7C9c376d2c";
