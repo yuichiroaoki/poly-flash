@@ -490,19 +490,19 @@ describe("Flashloan", () => {
 
   describe("Withdraw", () => {
     it("should withdraw tokens", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, owner.address, "1.0", 6);
+      await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
 
-      await Flashloan.withdrawToken(
-        USDC.address,
-        addr1.address,
-        getBigNumber(1, 6)
-      );
+      await expect(
+        Flashloan.withdrawToken(USDC.address, addr1.address, getBigNumber(1, 6))
+      )
+        .emit(Flashloan, "Withdrawal")
+        .withArgs(addr1.address, getBigNumber(1, 6));
       const balance = await USDC.balanceOf(addr1.address);
       expect(balance.eq(getBigNumber(1, 6))).to.be.true;
     });
 
     it("should be reverted when there's not enough tokens.", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, owner.address, "1.0", 6);
+      await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
 
       await expect(
         Flashloan.withdrawToken(
@@ -510,14 +510,14 @@ describe("Flashloan", () => {
           addr1.address,
           getBigNumber(10, 6)
         )
-      ).to.be.revertedWith("Not enough balance");
+      ).to.be.revertedWith("Not enough token");
     });
 
     it("should be reverted when non-owner call withdrawToken function", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, owner.address, "1.0", 6);
+      await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
 
       await expect(
-        Flashloan.withdrawToken(
+        Flashloan.connect(addr1).withdrawToken(
           USDC.address,
           addr1.address,
           getBigNumber(10, 6)
