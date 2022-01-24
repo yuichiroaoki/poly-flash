@@ -1,22 +1,21 @@
-import { ethers } from "hardhat";
+import { routerAddress } from "../constants/addresses";
 import { Flashloan, Flashloan__factory } from "../typechain";
+import { deployContractFromName } from "../utils";
 
 async function main() {
-	let Flashloan: Flashloan;
+  const Flashloan: Flashloan = await deployContractFromName(
+    "Flashloan",
+    Flashloan__factory,
+    [routerAddress]
+  );
+  await Flashloan.deployed();
 
-	const factory = (
-		await ethers.getContractFactory("Flashloan")
-	) as Flashloan__factory;
-
-	Flashloan = await factory.deploy();
-	await Flashloan.deployed();
-
-	console.log("contract deployed to:", Flashloan.address);
+  console.log("contract deployed to:", Flashloan.address);
 }
 
 main()
-	.then(() => process.exit(0))
-	.catch((error) => {
-		console.error(error);
-		process.exit(1);
-	});
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });

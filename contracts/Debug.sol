@@ -9,10 +9,17 @@ import "./uniswap/v3/ISwapRouter.sol";
 
 import "./dodo/IDODO.sol";
 import "./dodo/IDODOProxy.sol";
+
 import "./interfaces/IFlashloan.sol";
+import "./interfaces/IRouter.sol";
+
 import "./base/FlashloanValidation.sol";
 import "./base/DodoBase.sol";
+
 import "./libraries/BytesLib.sol";
+import "./libraries/Part.sol";
+import "./libraries/RouteUtils.sol";
+
 import "hardhat/console.sol";
 
 contract Debug is IFlashloan, FlashloanValidation, DodoBase {
@@ -22,6 +29,12 @@ contract Debug is IFlashloan, FlashloanValidation, DodoBase {
 
     event SentProfit(address recipient, uint256 profit);
     event SwapFinished(address token, uint256 amount);
+
+    IRouter uniswapRouter;
+
+    constructor(address _router) {
+        uniswapRouter = IRouter(_router);
+    }
 
     function dodoFlashLoan(FlashParams memory params)
         external
@@ -37,22 +50,17 @@ contract Debug is IFlashloan, FlashloanValidation, DodoBase {
             })
         );
 
-        address loanToken = params.firstRoutes[0].path[0];
-        if (IDODO(params.flashLoanPool)._BASE_TOKEN_() == loanToken) {
-            IDODO(params.flashLoanPool).flashLoan(
-                params.loanAmount,
-                0,
-                address(this),
-                data
-            );
-        } else if (IDODO(params.flashLoanPool)._QUOTE_TOKEN_() == loanToken) {
-            IDODO(params.flashLoanPool).flashLoan(
-                0,
-                params.loanAmount,
-                address(this),
-                data
-            );
-        }
+        address loanToken = RouteUtils.getInitialToken(params.firstRoutes[0]);
+        IDODO(params.flashLoanPool).flashLoan(
+            IDODO(params.flashLoanPool)._BASE_TOKEN_() == loanToken
+                ? params.loanAmount
+                : 0,
+            IDODO(params.flashLoanPool)._BASE_TOKEN_() == loanToken
+                ? 0
+                : params.loanAmount,
+            address(this),
+            data
+        );
     }
 
     function _flashLoanCallBack(
@@ -66,19 +74,29 @@ contract Debug is IFlashloan, FlashloanValidation, DodoBase {
             (FlashCallbackData)
         );
 
-        address loanToken = decoded.firstRoutes[0].path[0];
-
+        address loanToken = RouteUtils.getInitialToken(decoded.firstRoutes[0]);
+        address toToken = RouteUtils.getInitialToken(decoded.secondRoutes[0]);
         require(
             IERC20(loanToken).balanceOf(address(this)) >= decoded.loanAmount,
             "Failed to borrow loan token"
         );
 
         for (uint256 i = 0; i < decoded.firstRoutes.length; i++) {
-            pickProtocol(decoded.firstRoutes[i]);
+            uint256 amountIn = Part.partToAmountIn(
+                decoded.firstRoutes[i].part,
+                decoded.loanAmount
+            );
+            routeTrade(decoded.firstRoutes[i], amountIn);
         }
 
+        uint256 toTokenAmount = IERC20(toToken).balanceOf(address(this));
+
         for (uint256 i = 0; i < decoded.secondRoutes.length; i++) {
-            pickProtocol(decoded.secondRoutes[i]);
+            uint256 amountIn = Part.partToAmountIn(
+                decoded.secondRoutes[i].part,
+                toTokenAmount
+            );
+            routeTrade(decoded.secondRoutes[i], amountIn);
         }
 
         emit SwapFinished(
@@ -99,127 +117,180 @@ contract Debug is IFlashloan, FlashloanValidation, DodoBase {
         emit SentProfit(decoded.me, remained);
     }
 
-    function pickProtocol(Route memory route)
-        internal
-        checkRouteProtocol(route)
-    {
-        if (route.protocol == 0) {
-            dodoSwap(route);
-        } else if (route.protocol == 1) {
-            console.log("amountOut", uniswapV2(route)[1]);
-        } else if (route.protocol == 2) {
-            console.log("amountOut", uniswapV3(route));
+    function routeTrade(Route memory route, uint256 totalAmount) internal {
+        uint256 amountIn = totalAmount;
+        for (uint256 i = 0; i < route.hops.length; i++) {
+            amountIn = hopTrade(route.hops[i], amountIn);
         }
     }
 
-    function uniswapV3(Route memory route)
+    function hopTrade(Hop memory hop, uint256 totalAmount)
         internal
-        checkRouteUniswapV3(route)
-        returns (uint256 amountOut)
+        returns (uint256)
     {
-        address inputToken = route.path[0];
-        uint256 amountIn = IERC20(inputToken).balanceOf(address(this));
+        uint256 amountOut = 0;
+        for (uint256 i = 0; i < hop.swaps.length; i++) {
+            uint256 amountIn = Part.partToAmountIn(
+                hop.swaps[i].part,
+                totalAmount
+            );
+            amountOut += pickProtocol(hop.swaps[i], hop.path, amountIn);
+        }
+        return amountOut;
+    }
+
+    function pickProtocol(
+        Swap memory swap,
+        address[] memory path,
+        uint256 amountIn
+    ) internal returns (uint256 amountOut) {
+        if (swap.protocol == 0) {
+            // dodoSwap(swap, amountIn);
+            amountOut = uniswapV3(swap, path, amountIn);
+            console.log("amountOut", amountOut);
+        } else {
+            amountOut = uniswapV2(swap, path, amountIn)[1];
+            console.log("amountOut", amountOut);
+        }
+    }
+
+    function uniswapV3(
+        Swap memory swap,
+        address[] memory path,
+        uint256 amountIn
+    ) internal returns (uint256 amountOut) {
         console.log("amountIn", amountIn);
-        ISwapRouter swapRouter = ISwapRouter(
-            0xE592427A0AEce92De3Edee1F18E0157C05861564
+        address router = uniswapRouter.getRouterAddress(swap.protocol);
+        ISwapRouter swapRouter = ISwapRouter(router);
+        approveToken(path[0], address(swapRouter), amountIn);
+        uint24 fee = uniswapRouter.getFee(path[0], path[1]);
+
+        // single swaps
+        amountOut = swapRouter.exactInputSingle(
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: path[0],
+                tokenOut: path[1],
+                fee: fee,
+                recipient: address(this),
+                deadline: block.timestamp,
+                amountIn: amountIn,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            })
         );
-        approveToken(inputToken, address(swapRouter), amountIn);
-
-        if (route.path.length == 2) {
-            // single swaps
-            amountOut = swapRouter.exactInputSingle(
-                ISwapRouter.ExactInputSingleParams({
-                    tokenIn: inputToken,
-                    tokenOut: route.path[1],
-                    fee: route.fee[0],
-                    recipient: address(this),
-                    deadline: block.timestamp,
-                    amountIn: amountIn,
-                    amountOutMinimum: 0,
-                    sqrtPriceLimitX96: 0
-                })
-            );
-        } else if (route.path.length > 2) {
-            // multihop swaps
-            bytes memory tokenFee = "";
-            for (uint8 i = 0; i < route.path.length - 1; i++) {
-                tokenFee = tokenFee.merge(
-                    abi.encodePacked(route.path[i], route.fee[i])
-                );
-            }
-
-            amountOut = swapRouter.exactInput(
-                ISwapRouter.ExactInputParams({
-                    path: tokenFee.merge(
-                        abi.encodePacked(route.path[route.path.length - 1])
-                    ),
-                    recipient: address(this),
-                    deadline: block.timestamp,
-                    amountIn: amountIn,
-                    amountOutMinimum: 0
-                })
-            );
-        }
     }
 
-    function uniswapV2(Route memory route) internal returns (uint256[] memory) {
-        uint256 amountIn = IERC20(route.path[0]).balanceOf(address(this));
+    function uniswapV2(
+        Swap memory swap,
+        address[] memory path,
+        uint256 amountIn
+    ) internal returns (uint256[] memory) {
+        address router = uniswapRouter.getRouterAddress(swap.protocol);
+        approveToken(path[0], router, amountIn);
         console.log("amountIn", amountIn);
-        approveToken(route.path[0], route.pool, amountIn);
         return
-            IUniswapV2Router02(route.pool).swapExactTokensForTokens(
+            IUniswapV2Router02(router).swapExactTokensForTokens(
                 amountIn,
                 1,
-                route.path,
+                path,
                 address(this),
                 block.timestamp
             );
     }
 
-    function dodoSwap(Route memory route) internal {
-        address fromToken = route.path[0];
-        address toToken = route.path[1];
-        uint256 fromTokenAmount = IERC20(fromToken).balanceOf(address(this));
-        address dodoV2Pool = route.pool;
+    // function uniswapV3(Route memory route)
+    //     internal
+    //     checkRouteUniswapV3(route)
+    //     returns (uint256 amountOut)
+    // {
+    //     address inputToken = route.path[0];
+    //     uint256 amountIn = IERC20(inputToken).balanceOf(address(this));
+    //     console.log("amountIn", amountIn);
+    //     ISwapRouter swapRouter = ISwapRouter(
+    //         route.router
+    //     );
+    //     approveToken(inputToken, address(swapRouter), amountIn);
 
-        address[] memory dodoPairs = new address[](1); //one-hop
-        dodoPairs[0] = dodoV2Pool;
+    //     if (route.path.length == 2) {
+    //         // single swaps
+    //         amountOut = swapRouter.exactInputSingle(
+    //             ISwapRouter.ExactInputSingleParams({
+    //                 tokenIn: inputToken,
+    //                 tokenOut: route.path[1],
+    //                 fee: route.fee[0],
+    //                 recipient: address(this),
+    //                 deadline: block.timestamp,
+    //                 amountIn: amountIn,
+    //                 amountOutMinimum: 0,
+    //                 sqrtPriceLimitX96: 0
+    //             })
+    //         );
+    //     } else if (route.path.length > 2) {
+    //         // multihop swaps
+    //         bytes memory tokenFee = "";
+    //         for (uint8 i = 0; i < route.path.length - 1; i++) {
+    //             tokenFee = tokenFee.merge(
+    //                 abi.encodePacked(route.path[i], route.fee[i])
+    //             );
+    //         }
 
-        address baseToken = IDODO(dodoV2Pool)._BASE_TOKEN_();
+    //         amountOut = swapRouter.exactInput(
+    //             ISwapRouter.ExactInputParams({
+    //                 path: tokenFee.merge(
+    //                     abi.encodePacked(route.path[route.path.length - 1])
+    //                 ),
+    //                 recipient: address(this),
+    //                 deadline: block.timestamp,
+    //                 amountIn: amountIn,
+    //                 amountOutMinimum: 0
+    //             })
+    //         );
+    //     }
+    // }
 
-        uint256 directions = baseToken == fromToken ? 0 : 1;
+    // function dodoSwap(Swap memory swap, uint256 amountIn) internal {
+    //     address fromToken = swap.path[0];
+    //     address toToken = swap.path[1];
+    //     address dodoV2Pool = swap.router;
 
-        // pool address validation
-        if (directions == 0) {
-            require(
-                IDODO(dodoV2Pool)._QUOTE_TOKEN_() == toToken,
-                "Wrong dodo V2 pool address"
-            );
-        } else {
-            require(
-                IDODO(dodoV2Pool)._BASE_TOKEN_() == toToken,
-                "Wrong dodo V2 pool address"
-            );
-        }
+    //     address[] memory dodoPairs = new address[](1); //one-hop
+    //     dodoPairs[0] = dodoV2Pool;
 
-        uint256 deadline = block.timestamp;
+    //     address baseToken = IDODO(dodoV2Pool)._BASE_TOKEN_();
 
-        address dodoApprove = 0x6D310348d5c12009854DFCf72e0DF9027e8cb4f4;
-        approveToken(fromToken, dodoApprove, fromTokenAmount);
+    //     uint256 directions = baseToken == fromToken ? 0 : 1;
 
-        address dodoProxy = 0xa222e6a71D1A1Dd5F279805fbe38d5329C1d0e70;
+    //     // pool address validation
+    //     if (directions == 0) {
+    //         require(
+    //             IDODO(dodoV2Pool)._QUOTE_TOKEN_() == toToken,
+    //             "Wrong dodo V2 pool address"
+    //         );
+    //     } else {
+    //         require(
+    //             IDODO(dodoV2Pool)._BASE_TOKEN_() == toToken,
+    //             "Wrong dodo V2 pool address"
+    //         );
+    //     }
 
-        IDODOProxy(dodoProxy).dodoSwapV2TokenToToken(
-            fromToken,
-            toToken,
-            fromTokenAmount,
-            1,
-            dodoPairs,
-            directions,
-            false,
-            deadline
-        );
-    }
+    //     uint256 deadline = block.timestamp;
+
+    //     address dodoApprove = 0x6D310348d5c12009854DFCf72e0DF9027e8cb4f4;
+    //     approveToken(fromToken, dodoApprove, amountIn);
+
+    //     address dodoProxy = 0xa222e6a71D1A1Dd5F279805fbe38d5329C1d0e70;
+
+    //     IDODOProxy(dodoProxy).dodoSwapV2TokenToToken(
+    //         fromToken,
+    //         toToken,
+    //         amountIn,
+    //         1,
+    //         dodoPairs,
+    //         directions,
+    //         false,
+    //         deadline
+    //     );
+    // }
 
     function approveToken(
         address token,
