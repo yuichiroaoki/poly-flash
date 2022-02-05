@@ -5,30 +5,37 @@ import { ERC20Mock } from "../typechain";
 import { getBigNumber, getERC20ContractFromAddress } from "../utils";
 
 describe("DODO pool check", () => {
-	let DAI: ERC20Mock;
-	let USDC: ERC20Mock;
-	let WMATIC: ERC20Mock;
-	let WETH: ERC20Mock;
-	let USDT: ERC20Mock;
+  let DAI: ERC20Mock;
+  let USDC: ERC20Mock;
+  let WMATIC: ERC20Mock;
+  let WETH: ERC20Mock;
+  let USDT: ERC20Mock;
 
-	beforeEach(async () => {
-		USDC = await getERC20ContractFromAddress(erc20Address.USDC)
-		USDT = await getERC20ContractFromAddress(erc20Address.USDT)
-		DAI = await getERC20ContractFromAddress(erc20Address.DAI)
-		WETH = await getERC20ContractFromAddress(erc20Address.WETH)
-		WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC)
-	});
+  beforeEach(async () => {
+    USDC = await getERC20ContractFromAddress(erc20Address.USDC);
+    USDT = await getERC20ContractFromAddress(erc20Address.USDT);
+    DAI = await getERC20ContractFromAddress(erc20Address.DAI);
+    WETH = await getERC20ContractFromAddress(erc20Address.WETH);
+    WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC);
+  });
 
-	describe("Check if dodo pools have enough tokens", () => {
-		for (const [name, poolAddr] of Object.entries(dodoV2Pool)) {
-			it(name, async () => {
-				const dodoPool = await ethers.getContractAt(
-					"IDODO",
-					poolAddr
-				);
-				expect((await dodoPool._BASE_RESERVE_()).gt(getBigNumber(1000, 6)))
-				expect((await dodoPool._QUOTE_RESERVE_()).gt(getBigNumber(1000, 6)))
-			});
-		}
-	});
+  describe("Check if dodo pools have enough tokens", () => {
+    for (const [name, poolAddr] of Object.entries(dodoV2Pool)) {
+      it(name, async () => {
+        const dodoPool = await ethers.getContractAt("IDODO", poolAddr);
+        if (poolAddr !== dodoV2Pool.WBTC_USDC) {
+          expect(
+            (await dodoPool._BASE_RESERVE_()).gt(getBigNumber(10000, 6))
+          ).to.equal(true);
+        } else {
+          expect(
+            (await dodoPool._BASE_RESERVE_()).gt(getBigNumber(1, 8))
+          ).to.equal(true);
+        }
+        expect(
+          (await dodoPool._QUOTE_RESERVE_()).gt(getBigNumber(10000, 6))
+        ).to.equal(true);
+      });
+    }
+  });
 });

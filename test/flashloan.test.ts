@@ -10,6 +10,7 @@ import {
   USDC_WHALE,
   UniswapV3poolFee,
 } from "../constants/addresses";
+import { ERC20Token } from "../constants/token";
 import {
   ERC20Mock,
   Router,
@@ -64,11 +65,17 @@ describe("Flashloan", () => {
       Router.address,
     ]);
     await Flashloan.deployed();
+    await impersonateFundErc20(
+      USDC,
+      USDC_WHALE,
+      Flashloan.address,
+      "1000.0",
+      6
+    );
   });
 
   describe("UniswapV2", () => {
     it("should execute uniswapV2 flashloan.", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
       await expect(
         Flashloan.dodoFlashLoan(
           {
@@ -116,12 +123,63 @@ describe("Flashloan", () => {
       expect(balance.gt(getBigNumber(0))).to.be.true;
     });
 
+    it("USDC - WETH - WBTC", async () => {
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WETH_USDC,
+            loanAmount: getBigNumber(1, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 1,
+                        part: 10000,
+                      },
+                    ],
+                    path: [
+                      ERC20Token.USDC.address,
+                      ERC20Token.WETH.address,
+                      ERC20Token.WBTC.address,
+                    ],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 2,
+                        part: 10000,
+                      },
+                    ],
+                    path: [
+                      ERC20Token.WBTC.address,
+                      ERC20Token.WETH.address,
+                      ERC20Token.USDC.address,
+                    ],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      )
+        .emit(Flashloan, "SwapFinished")
+        .emit(Flashloan, "SentProfit");
+      const balance = await USDC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(0))).to.be.true;
+    });
+
     it("should execute a flashloan with multihop swaps.", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
-      expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to.be
-        .true;
-      expect((await WETH.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to
-        .be.true;
       await expect(
         Flashloan.dodoFlashLoan(
           {
@@ -197,7 +255,6 @@ describe("Flashloan", () => {
 
   describe("UniswapV3", () => {
     it("should execute uniswapV3 flashloan.", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
       await expect(
         Flashloan.dodoFlashLoan(
           {
@@ -245,14 +302,73 @@ describe("Flashloan", () => {
       expect(balance.gt(getBigNumber(0))).to.be.true;
     });
 
+    it("USDC - WETH - UNI", async () => {
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WETH_USDC,
+            loanAmount: getBigNumber(1, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                      },
+                    ],
+                    path: [ERC20Token.USDC.address, ERC20Token.WETH.address],
+                  },
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                      },
+                    ],
+                    path: [ERC20Token.WETH.address, ERC20Token.UNI.address],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                      },
+                    ],
+                    path: [ERC20Token.UNI.address, ERC20Token.WETH.address],
+                  },
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                      },
+                    ],
+                    path: [ERC20Token.WETH.address, ERC20Token.USDC.address],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      )
+        .emit(Flashloan, "SwapFinished")
+        .emit(Flashloan, "SentProfit");
+      const balance = await USDC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(0))).to.be.true;
+    });
+
     it("should execute uniswapV3 flashloan with multiple swaps.", async () => {
-      await impersonateFundErc20(
-        USDC,
-        USDC_WHALE,
-        Flashloan.address,
-        "1000.0",
-        6
-      );
       await expect(
         Flashloan.dodoFlashLoan(
           {
@@ -319,13 +435,6 @@ describe("Flashloan", () => {
     });
 
     it("should execute uniswapV3 flashloan with multiple routes.", async () => {
-      await impersonateFundErc20(
-        USDC,
-        USDC_WHALE,
-        Flashloan.address,
-        "10.0",
-        6
-      );
       await expect(
         Flashloan.dodoFlashLoan(
           {
@@ -393,7 +502,6 @@ describe("Flashloan", () => {
   // describe("DODO", () => {
 
   // 	it("should execute flashloan.", async () => {
-  // 		await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6)
   // 		await expect(
   // 			Flashloan.dodoFlashLoan({
   // 				flashLoanPool: dodoV2Pool.WETH_USDC,
@@ -490,8 +598,6 @@ describe("Flashloan", () => {
 
   describe("Withdraw", () => {
     it("should withdraw tokens", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
-
       await expect(
         Flashloan.withdrawToken(USDC.address, addr1.address, getBigNumber(1, 6))
       )
@@ -502,20 +608,16 @@ describe("Flashloan", () => {
     });
 
     it("should be reverted when there's not enough tokens.", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
-
       await expect(
         Flashloan.withdrawToken(
           USDC.address,
           addr1.address,
-          getBigNumber(10, 6)
+          getBigNumber(10000, 6)
         )
       ).to.be.revertedWith("Not enough token");
     });
 
     it("should be reverted when non-owner call withdrawToken function", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Flashloan.address, "1.0", 6);
-
       await expect(
         Flashloan.connect(addr1).withdrawToken(
           USDC.address,
