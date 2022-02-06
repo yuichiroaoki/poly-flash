@@ -1,7 +1,13 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { dodoV2Pool, erc20Address, USDC_WHALE } from "../constants/addresses";
+import {
+  DODOApprove,
+  dodoV2Pool,
+  DODOV2Proxy,
+  erc20Address,
+  USDC_WHALE,
+} from "../constants/addresses";
 import { ERC20Token } from "../constants/token";
 import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
 import {
@@ -549,6 +555,212 @@ describe("Flashloan", () => {
                   },
                 ],
                 part: 1000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "uint24"],
+                          [findRouterFromProtocol(0), 500]
+                        ),
+                      },
+                    ],
+                    path: [erc20Address.DAI, erc20Address.USDC],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      )
+        .emit(Flashloan, "SwapFinished")
+        .emit(Flashloan, "SentProfit");
+      const balance = await USDC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(0))).to.be.true;
+      expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to.be
+        .true;
+    });
+  });
+
+  describe("DODO", () => {
+    it("USDC - DAI", async () => {
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WETH_USDC,
+            loanAmount: getBigNumber(1000, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "uint24"],
+                          [findRouterFromProtocol(0), 500]
+                        ),
+                      },
+                    ],
+                    path: [erc20Address.USDC, erc20Address.DAI],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 8,
+                        part: 10000,
+
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "address", "address"],
+                          [
+                            dodoV2Pool.USDC_DAI,
+                            DODOApprove.Polygon,
+                            DODOV2Proxy.Polygon,
+                          ]
+                        ),
+                      },
+                    ],
+                    path: [erc20Address.DAI, erc20Address.USDC],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      )
+        .emit(Flashloan, "SwapFinished")
+        .emit(Flashloan, "SentProfit");
+      const balance = await USDC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(0))).to.be.true;
+      expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to.be
+        .true;
+    });
+
+    it("USDC - DAI", async () => {
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WETH_USDC,
+            loanAmount: getBigNumber(1000, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 8,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "address", "address"],
+                          [
+                            dodoV2Pool.USDC_DAI,
+                            DODOApprove.Polygon,
+                            DODOV2Proxy.Polygon,
+                          ]
+                        ),
+                      },
+                    ],
+                    path: [erc20Address.USDC, erc20Address.DAI],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "uint24"],
+                          [findRouterFromProtocol(0), 500]
+                        ),
+                      },
+                    ],
+                    path: [erc20Address.DAI, erc20Address.USDC],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      )
+        .emit(Flashloan, "SwapFinished")
+        .emit(Flashloan, "SentProfit");
+      const balance = await USDC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(0))).to.be.true;
+      expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to.be
+        .true;
+    });
+
+    it("USDC - USDT - DAI", async () => {
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WETH_USDC,
+            loanAmount: getBigNumber(1000, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 8,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "address", "address"],
+                          [
+                            dodoV2Pool.USDC_USDT,
+                            DODOApprove.Polygon,
+                            DODOV2Proxy.Polygon,
+                          ]
+                        ),
+                      },
+                    ],
+                    path: [erc20Address.USDC, erc20Address.USDT],
+                  },
+                  {
+                    swaps: [
+                      {
+                        protocol: 8,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "address", "address"],
+                          [
+                            dodoV2Pool.USDT_DAI,
+                            DODOApprove.Polygon,
+                            DODOV2Proxy.Polygon,
+                          ]
+                        ),
+                      },
+                    ],
+                    path: [erc20Address.USDT, erc20Address.DAI],
+                  },
+                ],
+                part: 10000,
               },
             ],
             secondRoutes: [

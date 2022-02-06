@@ -12,6 +12,7 @@ import "./dodo/IDODO.sol";
 import "./interfaces/IFlashloan.sol";
 
 import "./base/DodoBase.sol";
+import "./dodo/IDODOProxy.sol";
 import "./base/FlashloanValidation.sol";
 import "./base/Withdraw.sol";
 
@@ -129,11 +130,13 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
         Swap memory swap,
         uint256 amountIn,
         address[] memory path
-    ) internal returns (uint256 amountOut) {
+    ) internal checkRouteProtocol(swap) returns (uint256 amountOut) {
         if (swap.protocol == 0) {
             amountOut = uniswapV3(swap.data, amountIn, path);
-        } else {
+        } else if (swap.protocol < 8) {
             amountOut = uniswapV2(swap.data, amountIn, path);
+        } else {
+            amountOut = dodoV2Swap(swap.data, amountIn, path);
         }
     }
 
@@ -176,6 +179,31 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
                 address(this),
                 block.timestamp
             )[1];
+    }
+
+    function dodoV2Swap(
+        bytes memory data,
+        uint256 amountIn,
+        address[] memory path
+    ) internal returns (uint256 amountOut) {
+        (address dodoV2Pool, address dodoApprove, address dodoProxy) = abi
+            .decode(data, (address, address, address));
+        address[] memory dodoPairs = new address[](1); //one-hop
+        dodoPairs[0] = dodoV2Pool;
+        uint256 directions = IDODO(dodoV2Pool)._BASE_TOKEN_() == path[0]
+            ? 0
+            : 1;
+        approveToken(path[0], dodoApprove, amountIn);
+        amountOut = IDODOProxy(dodoProxy).dodoSwapV2TokenToToken(
+            path[0],
+            path[1],
+            amountIn,
+            1,
+            dodoPairs,
+            directions,
+            false,
+            block.timestamp
+        );
     }
 
     function approveToken(
