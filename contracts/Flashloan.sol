@@ -10,7 +10,6 @@ import "./uniswap/v3/ISwapRouter.sol";
 import "./dodo/IDODO.sol";
 
 import "./interfaces/IFlashloan.sol";
-import "./interfaces/IRouter.sol";
 
 import "./base/DodoBase.sol";
 import "./base/FlashloanValidation.sol";
@@ -25,12 +24,6 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
 
     event SentProfit(address recipient, uint256 profit);
     event SwapFinished(address token, uint256 amount);
-
-    IRouter uniswapRouter;
-
-    constructor(address _router) {
-        uniswapRouter = IRouter(_router);
-    }
 
     function dodoFlashLoan(FlashParams memory params)
         external
@@ -127,33 +120,31 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
                 hop.swaps[i].part,
                 totalAmount
             );
-            amountOut += pickProtocol(hop.swaps[i], hop.path, amountIn);
+            amountOut += pickProtocol(hop.swaps[i], amountIn, hop.path);
         }
         return amountOut;
     }
 
     function pickProtocol(
         Swap memory swap,
-        address[] memory path,
-        uint256 amountIn
+        uint256 amountIn,
+        address[] memory path
     ) internal returns (uint256 amountOut) {
         if (swap.protocol == 0) {
-            // dodoSwap(swap, amountIn);
-            return uniswapV3(swap, path, amountIn);
+            amountOut = uniswapV3(swap.data, amountIn, path);
         } else {
-            return uniswapV2(swap, path, amountIn)[1];
+            amountOut = uniswapV2(swap.data, amountIn, path);
         }
     }
 
     function uniswapV3(
-        Swap memory swap,
-        address[] memory path,
-        uint256 amountIn
+        bytes memory data,
+        uint256 amountIn,
+        address[] memory path
     ) internal returns (uint256 amountOut) {
-        address router = uniswapRouter.getRouterAddress(swap.protocol);
+        (address router, uint24 fee) = abi.decode(data, (address, uint24));
         ISwapRouter swapRouter = ISwapRouter(router);
         approveToken(path[0], address(swapRouter), amountIn);
-        uint24 fee = uniswapRouter.getFee(path[0], path[1]);
 
         // single swaps
         amountOut = swapRouter.exactInputSingle(
@@ -171,11 +162,11 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
     }
 
     function uniswapV2(
-        Swap memory swap,
-        address[] memory path,
-        uint256 amountIn
-    ) internal returns (uint256[] memory) {
-        address router = uniswapRouter.getRouterAddress(swap.protocol);
+        bytes memory data,
+        uint256 amountIn,
+        address[] memory path
+    ) internal returns (uint256 amountOut) {
+        address router = abi.decode(data, (address));
         approveToken(path[0], router, amountIn);
         return
             IUniswapV2Router02(router).swapExactTokensForTokens(
@@ -184,7 +175,7 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
                 path,
                 address(this),
                 block.timestamp
-            );
+            )[1];
     }
 
     function approveToken(

@@ -5,6 +5,7 @@ interface IFlashloan {
     struct Swap {
         uint8 protocol;
         uint16 part;
+        bytes data;
     }
 
     struct Hop {

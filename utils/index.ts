@@ -1,4 +1,5 @@
 import { ethers } from "hardhat";
+import { uniswapRouter } from "../constants/addresses";
 import { ERC20Mock__factory } from "../typechain";
 const { BigNumber } = ethers;
 
@@ -38,4 +39,12 @@ export const getERC20ContractFromAddress = async (address: string) => {
     "ERC20Mock"
   )) as ERC20Mock__factory;
   return factory.attach(address);
+};
+
+/**
+ * @param protocol
+ * @returns router address
+ */
+export const findRouterFromProtocol = (protocol: number) => {
+  return uniswapRouter[Object.keys(uniswapRouter)[protocol]];
 };
