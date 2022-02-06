@@ -654,6 +654,68 @@ describe("Flashloan", () => {
         .true;
     });
 
+    it("USDC - WMATIC", async () => {
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WETH_USDC,
+            loanAmount: getBigNumber(1000, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "uint24"],
+                          [findRouterFromProtocol(0), 500]
+                        ),
+                      },
+                    ],
+                    path: [erc20Address.USDC, erc20Address.WMATIC],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 8,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "address", "address"],
+                          [
+                            dodoV2Pool.WMATIC_USDC,
+                            DODOApprove.Polygon,
+                            DODOV2Proxy.Polygon,
+                          ]
+                        ),
+                      },
+                    ],
+                    path: [erc20Address.WMATIC, erc20Address.USDC],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      )
+        .emit(Flashloan, "SwapFinished")
+        .emit(Flashloan, "SentProfit");
+      const balance = await USDC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(0))).to.be.true;
+      expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to.be
+        .true;
+    });
+
     it("USDC - DAI", async () => {
       await expect(
         Flashloan.dodoFlashLoan(

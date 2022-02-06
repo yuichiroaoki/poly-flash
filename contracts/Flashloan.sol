@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-import "./uniswap/IUniswapV2Router02.sol";
+import "./uniswap/IUniswapV2Router.sol";
 import "./uniswap/v3/ISwapRouter.sol";
 
 import "./dodo/IDODO.sol";
@@ -172,7 +172,7 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
         address router = abi.decode(data, (address));
         approveToken(path[0], router, amountIn);
         return
-            IUniswapV2Router02(router).swapExactTokensForTokens(
+            IUniswapV2Router(router).swapExactTokensForTokens(
                 amountIn,
                 1,
                 path,
