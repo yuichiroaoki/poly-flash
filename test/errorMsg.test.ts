@@ -1,21 +1,8 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { ethers, upgrades } from "hardhat";
-import {
-  dodoV2Pool,
-  erc20Address,
-  uniswapRouter,
-  BurnAddress,
-  USDC_WHALE,
-  UniswapV3poolFee,
-} from "../constants/addresses";
-import {
-  ERC20Mock,
-  Flashloan,
-  Flashloan__factory,
-  Router,
-  Router__factory,
-} from "../typechain";
+import { ethers } from "hardhat";
+import { dodoV2Pool, erc20Address } from "../constants/addresses";
+import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
 import {
   deployContractFromName,
   findRouterFromProtocol,
@@ -24,7 +11,6 @@ import {
 } from "../utils";
 
 describe("Flashloan Error Message", () => {
-  let Router: Router;
   let Flashloan: Flashloan;
   let owner: SignerWithAddress;
   let addr1: SignerWithAddress;
@@ -43,19 +29,6 @@ describe("Flashloan Error Message", () => {
     DAI = await getERC20ContractFromAddress(erc20Address.DAI);
     WETH = await getERC20ContractFromAddress(erc20Address.WETH);
     WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC);
-
-    const factory = (await ethers.getContractFactory(
-      "Router",
-      owner
-    )) as Router__factory;
-    Router = (await upgrades.deployProxy(
-      factory,
-      [Object.values(uniswapRouter), UniswapV3poolFee],
-      {
-        initializer: "initialize",
-      }
-    )) as Router;
-    await Router.deployed();
   });
 
   beforeEach(async () => {
