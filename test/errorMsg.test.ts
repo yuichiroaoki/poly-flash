@@ -18,10 +18,10 @@ import {
 } from "../typechain";
 import {
   deployContractFromName,
+  findRouterFromProtocol,
   getBigNumber,
   getERC20ContractFromAddress,
 } from "../utils";
-import { impersonateFundErc20 } from "../utils/token";
 
 describe("Flashloan Error Message", () => {
   let Router: Router;
@@ -61,9 +61,7 @@ describe("Flashloan Error Message", () => {
   beforeEach(async () => {
     [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
 
-    Flashloan = await deployContractFromName("Flashloan", Flashloan__factory, [
-      Router.address,
-    ]);
+    Flashloan = await deployContractFromName("Flashloan", Flashloan__factory);
     await Flashloan.deployed();
   });
 
@@ -82,6 +80,10 @@ describe("Flashloan Error Message", () => {
                       {
                         protocol: 1,
                         part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address"],
+                          [findRouterFromProtocol(1)]
+                        ),
                       },
                     ],
                     path: [erc20Address.USDC, erc20Address.WETH],
@@ -98,6 +100,10 @@ describe("Flashloan Error Message", () => {
                       {
                         protocol: 1,
                         part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address"],
+                          [findRouterFromProtocol(1)]
+                        ),
                       },
                     ],
                     path: [erc20Address.WETH, erc20Address.USDC],
@@ -126,6 +132,10 @@ describe("Flashloan Error Message", () => {
                       {
                         protocol: 1,
                         part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address"],
+                          [findRouterFromProtocol(1)]
+                        ),
                       },
                     ],
                     path: [erc20Address.WMATIC, erc20Address.DAI],
@@ -140,6 +150,10 @@ describe("Flashloan Error Message", () => {
                       {
                         protocol: 1,
                         part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address"],
+                          [findRouterFromProtocol(1)]
+                        ),
                       },
                     ],
                     path: [erc20Address.DAI, erc20Address.USDC],
@@ -156,6 +170,10 @@ describe("Flashloan Error Message", () => {
                       {
                         protocol: 1,
                         part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address"],
+                          [findRouterFromProtocol(1)]
+                        ),
                       },
                     ],
                     path: [erc20Address.USDC, erc20Address.WMATIC],
@@ -184,10 +202,18 @@ describe("Flashloan Error Message", () => {
                       {
                         protocol: 1,
                         part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address"],
+                          [findRouterFromProtocol(1)]
+                        ),
                       },
                       {
                         protocol: 2,
                         part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address"],
+                          [findRouterFromProtocol(2)]
+                        ),
                       },
                     ],
                     path: [erc20Address.WMATIC, erc20Address.DAI],
@@ -204,6 +230,10 @@ describe("Flashloan Error Message", () => {
                       {
                         protocol: 1,
                         part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address"],
+                          [findRouterFromProtocol(1)]
+                        ),
                       },
                     ],
                     path: [erc20Address.DAI, erc20Address.WMATIC],
@@ -275,6 +305,10 @@ describe("Flashloan Error Message", () => {
                     {
                       protocol: 1,
                       part: 10000,
+                      data: ethers.utils.defaultAbiCoder.encode(
+                        ["address"],
+                        [findRouterFromProtocol(1)]
+                      ),
                     },
                   ],
                   path: [erc20Address.USDC, erc20Address.WETH],
@@ -291,6 +325,10 @@ describe("Flashloan Error Message", () => {
                     {
                       protocol: 1,
                       part: 10000,
+                      data: ethers.utils.defaultAbiCoder.encode(
+                        ["address"],
+                        [findRouterFromProtocol(1)]
+                      ),
                     },
                   ],
                   path: [erc20Address.WETH, erc20Address.USDC],
@@ -319,6 +357,10 @@ describe("Flashloan Error Message", () => {
                     {
                       protocol: 28,
                       part: 10000,
+                      data: ethers.utils.defaultAbiCoder.encode(
+                        ["address"],
+                        [findRouterFromProtocol(1)]
+                      ),
                     },
                   ],
                   path: [erc20Address.USDC, erc20Address.WETH],
@@ -335,6 +377,10 @@ describe("Flashloan Error Message", () => {
                     {
                       protocol: 1,
                       part: 10000,
+                      data: ethers.utils.defaultAbiCoder.encode(
+                        ["address"],
+                        [findRouterFromProtocol(1)]
+                      ),
                     },
                   ],
                   path: [erc20Address.WETH, erc20Address.USDC],

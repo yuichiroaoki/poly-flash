@@ -107,7 +107,7 @@ describe("Flashloan", () => {
         Flashloan.dodoFlashLoan(
           {
             flashLoanPool: dodoV2Pool.WETH_USDC,
-            loanAmount: getBigNumber(1, 6),
+            loanAmount: getBigNumber(1000, 6),
             firstRoutes: [
               {
                 hops: [
@@ -284,7 +284,7 @@ describe("Flashloan", () => {
         Flashloan.dodoFlashLoan(
           {
             flashLoanPool: dodoV2Pool.WETH_USDC,
-            loanAmount: getBigNumber(1, 6),
+            loanAmount: getBigNumber(1000, 6),
             firstRoutes: [
               {
                 hops: [
