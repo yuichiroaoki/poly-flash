@@ -1,12 +1,10 @@
-import { routerAddress } from "../constants/addresses";
 import { Flashloan, Flashloan__factory } from "../typechain";
 import { deployContractFromName } from "../utils";
 
 async function main() {
   const Flashloan: Flashloan = await deployContractFromName(
     "Flashloan",
-    Flashloan__factory,
-    [routerAddress]
+    Flashloan__factory
   );
   await Flashloan.deployed();
 
