@@ -860,6 +860,63 @@ describe("Flashloan", () => {
   });
 
   describe("Curve", () => {
+    it("USDC - DAI", async () => {
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WETH_USDC,
+            loanAmount: getBigNumber(1000, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "uint24"],
+                          [findRouterFromProtocol(0), 500]
+                        ),
+                      },
+                    ],
+                    path: [ERC20Token.USDC.address, ERC20Token.DAI.address],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 9,
+                        part: 10000,
+
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["uint256", "uint256", "address"],
+                          [0, 1, CurveSwapsAddress]
+                        ),
+                      },
+                    ],
+                    path: [ERC20Token.DAI.address, ERC20Token.USDC.address],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      )
+        .emit(Flashloan, "SwapFinished")
+        .emit(Flashloan, "SentProfit");
+      const balance = await USDC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(0))).to.be.true;
+    });
+
     it("USDC - WBTC", async () => {
       await expect(
         Flashloan.dodoFlashLoan(
