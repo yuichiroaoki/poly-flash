@@ -5,6 +5,7 @@
 */
 
 pragma solidity ^0.8;
+
 // pragma solidity 0.6.9;
 
 // import {IERC20} from "../interfaces/IERC20.sol";
@@ -21,4 +22,8 @@ interface IDODOV2 {
         external
         view
         returns (uint256 receiveBaseAmount, uint256 mtFee);
+
+    function _BASE_TOKEN_() external view returns (address);
+
+    function _QUOTE_TOKEN_() external view returns (address);
 }

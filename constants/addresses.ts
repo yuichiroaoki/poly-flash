@@ -80,3 +80,5 @@ export const DODOV2Proxy = {
   Heco: "0xAc7cC7d2374492De2D1ce21e2FEcA26EB0d113e7",
   Arbitrum: "0x88CBf433471A0CD8240D2a12354362988b4593E5",
 };
+
+export const CurveSwapsAddress = "0x1d8b86e3D88cDb2d34688e87E72F388Cb541B7C8";
