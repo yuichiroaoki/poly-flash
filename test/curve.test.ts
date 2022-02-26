@@ -72,11 +72,38 @@ describe("Curve fi", () => {
       expect(balance.gt(getBigNumber(9))).to.be.true;
     });
 
+    it("USDC - DAI - USDC", async () => {
+      await impersonateFundErc20(USDC, USDC_WHALE, owner.address, "1000.0", 6);
+      await USDC.approve(Curve.address, getBigNumber(1000, 6));
+      await Curve.exchange_underlying(
+        1,
+        0,
+        getBigNumber(1000, 6),
+        getBigNumber(9)
+      );
+      const daiBalance = await DAI.balanceOf(owner.address);
+      await DAI.approve(Curve.address, daiBalance);
+      await Curve.exchange_underlying(0, 1, daiBalance, getBigNumber(9, 6));
+      const balance = await USDC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(900, 6))).to.be.true;
+    });
+
     it("USDC - WBTC", async () => {
       await impersonateFundErc20(USDC, USDC_WHALE, owner.address, "1000.0", 6);
-      await USDC.approve(Curve.address, getBigNumber(10, 6));
-      await Curve.exchange_underlying(1, 3, getBigNumber(10, 6), 0);
+      await USDC.approve(Curve.address, getBigNumber(1000, 6));
+      await Curve.exchange_underlying(1, 3, getBigNumber(1000, 6), 0);
       const balance = await WBTC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(0))).to.be.true;
+    });
+
+    it("USDC - WBTC - USDC", async () => {
+      await impersonateFundErc20(USDC, USDC_WHALE, owner.address, "1000.0", 6);
+      await USDC.approve(Curve.address, getBigNumber(1000, 6));
+      await Curve.exchange_underlying(1, 3, getBigNumber(1000, 6), 0);
+      const wbtcBalance = await WBTC.balanceOf(owner.address);
+      await WBTC.approve(Curve.address, wbtcBalance);
+      await Curve.exchange_underlying(3, 1, wbtcBalance, 0);
+      const balance = await USDC.balanceOf(owner.address);
       expect(balance.gt(getBigNumber(0))).to.be.true;
     });
   });
