@@ -34,7 +34,7 @@ describe("Swap on uniswap fork on polygon", () => {
     WMATIC = await getERC20ContractFromAddress(erc20Address.WMATIC);
 
     fixture = async () => {
-      [owner, addr2, addr2, ...addrs] = await ethers.getSigners();
+      [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
 
       const factory = (await ethers.getContractFactory(
         "UniswapFork",
