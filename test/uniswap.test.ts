@@ -56,12 +56,9 @@ describe("Swap on uniswap fork on polygon", () => {
       const tokenOut = erc20Address.USDC;
       const amountIn = getBigNumber(1);
       const routerAddress = uniswapRouter.POLYGON_QUICKSWAP;
-      const expected = await getPriceOnUniV2(
-        tokenIn,
-        tokenOut,
-        amountIn,
-        routerAddress
-      );
+      const expected = (
+        await getPriceOnUniV2(tokenIn, tokenOut, amountIn, routerAddress)
+      ).add(getBigNumber(100, 6));
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_QUICKSWAP,
