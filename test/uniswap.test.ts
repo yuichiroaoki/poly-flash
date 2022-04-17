@@ -6,7 +6,6 @@ import {
   USDC_WHALE,
   erc20Address,
   uniswapRouter,
-  WETH_WHALE,
 } from "../constants/addresses";
 import { getErc20Balance, impersonateFundErc20 } from "../utils/token";
 import { getPriceOnUniV2 } from "../utils/v2/getPrice";
@@ -41,6 +40,9 @@ describe("Swap on uniswap fork on polygon", () => {
         owner
       )) as UniswapFork__factory;
       Fork = await factory.deploy();
+
+      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
+      await impersonateFundErc20(USDC, USDC_WHALE, Fork.address, "100.0", 6);
     };
   });
 
@@ -50,7 +52,6 @@ describe("Swap on uniswap fork on polygon", () => {
 
   describe("quickswap", async () => {
     it("should execute dai -> usdc swap", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       const tokenIn = erc20Address.DAI;
       const tokenOut = erc20Address.USDC;
       const amountIn = getBigNumber(1);
@@ -75,7 +76,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should swap multihop usdc -> dai", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Fork.address, "100.0", 6);
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_QUICKSWAP,
@@ -89,7 +89,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should execute dai -> wmatic swap with multihop", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_QUICKSWAP,
@@ -105,7 +104,6 @@ describe("Swap on uniswap fork on polygon", () => {
 
   describe("sushiswap", async () => {
     it("should execute dai -> usdc swap", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_SUSHISWAP,
@@ -119,7 +117,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should execute usdc -> dai swap", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Fork.address, "100.0", 6);
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_SUSHISWAP,
@@ -133,7 +130,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should execute dai -> wmatic swap with multihop", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_SUSHISWAP,
@@ -149,7 +145,6 @@ describe("Swap on uniswap fork on polygon", () => {
 
   describe("waultswap", async () => {
     it("should execute dai -> usdc swap", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_WAULTSWAP,
@@ -163,7 +158,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should execute usdc -> dai swap", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Fork.address, "100.0", 6);
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_WAULTSWAP,
@@ -177,7 +171,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should execute dai -> wmatic swap with multihop", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_WAULTSWAP,
@@ -193,7 +186,6 @@ describe("Swap on uniswap fork on polygon", () => {
 
   describe("jetswap", async () => {
     it("should execute dai -> usdc swap", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_JETSWAP,
@@ -207,7 +199,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should execute usdc -> dai swap", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Fork.address, "100.0", 6);
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_JETSWAP,
@@ -221,7 +212,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should execute dai -> wmatic swap with multihop", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_JETSWAP,
@@ -237,7 +227,6 @@ describe("Swap on uniswap fork on polygon", () => {
 
   describe("apeswap", async () => {
     it("should execute dai -> usdc swap", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_APESWAP,
@@ -251,7 +240,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should execute usdc -> dai swap", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Fork.address, "100.0", 6);
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_APESWAP,
@@ -265,7 +253,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should execute dai -> wmatic swap with multihop", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_APESWAP,
@@ -281,7 +268,6 @@ describe("Swap on uniswap fork on polygon", () => {
 
   describe("polycat", async () => {
     it("should execute dai -> usdc swap", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_POLYCAT,
@@ -295,7 +281,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should execute usdc -> dai swap", async () => {
-      await impersonateFundErc20(USDC, USDC_WHALE, Fork.address, "100.0", 6);
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_POLYCAT,
@@ -309,7 +294,6 @@ describe("Swap on uniswap fork on polygon", () => {
     });
 
     it("should execute dai -> wmatic swap with multihop", async () => {
-      await impersonateFundErc20(DAI, USDC_WHALE, Fork.address, "100.0");
       await expect(
         Fork.uniswapFork(
           uniswapRouter.POLYGON_POLYCAT,
