@@ -64,6 +64,7 @@ describe("Flashloan", () => {
                   {
                     swaps: [
                       {
+                        // sushiswap
                         protocol: 1,
                         part: 10000,
                         data: ethers.utils.defaultAbiCoder.encode(
@@ -326,6 +327,75 @@ describe("Flashloan", () => {
                       },
                     ],
                     path: [erc20Address.DAI, erc20Address.USDC],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+          },
+          { gasLimit: 1000000 }
+        )
+      )
+        .emit(Flashloan, "SwapFinished")
+        .emit(Flashloan, "SentProfit");
+      const balance = await USDC.balanceOf(owner.address);
+      expect(balance.gt(getBigNumber(0))).to.be.true;
+    });
+
+    it("USDC - WETH - LINK - USDC", async () => {
+      await expect(
+        Flashloan.dodoFlashLoan(
+          {
+            flashLoanPool: dodoV2Pool.WETH_USDC,
+            loanAmount: getBigNumber(1000, 6),
+            firstRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "uint24"],
+                          [findRouterFromProtocol(0), 500]
+                        ),
+                      },
+                    ],
+                    path: [erc20Address.USDC, erc20Address.WETH],
+                  },
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "uint24"],
+                          [findRouterFromProtocol(0), 3000]
+                        ),
+                      },
+                    ],
+                    path: [erc20Address.WETH, ERC20Token.LINK.address],
+                  },
+                ],
+                part: 10000,
+              },
+            ],
+            secondRoutes: [
+              {
+                hops: [
+                  {
+                    swaps: [
+                      {
+                        protocol: 0,
+                        part: 10000,
+                        data: ethers.utils.defaultAbiCoder.encode(
+                          ["address", "uint24"],
+                          [findRouterFromProtocol(0), 3000]
+                        ),
+                      },
+                    ],
+                    path: [ERC20Token.LINK.address, erc20Address.USDC],
                   },
                 ],
                 part: 10000,
