@@ -85,6 +85,7 @@ describe("Flashloan", () => {
                   {
                     swaps: [
                       {
+                        // sushiswap
                         protocol: 1,
                         part: 10000,
                         data: ethers.utils.defaultAbiCoder.encode(
@@ -302,6 +303,7 @@ describe("Flashloan", () => {
                         part: 10000,
                         data: ethers.utils.defaultAbiCoder.encode(
                           ["address", "uint24"],
+                          // 0.05 % => 500
                           [findRouterFromProtocol(0), 500]
                         ),
                       },
