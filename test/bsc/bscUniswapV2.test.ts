@@ -40,7 +40,7 @@ describe("Swap on uniswap fork on bsc", () => {
   });
 
   describe("pancakeswap", async () => {
-    xit("should execute dai -> usdc swap", async () => {
+    it("should execute dai -> usdc swap", async () => {
       const tokenIn = bscTokens.USDC;
       const tokenOut = bscTokens.DAI;
       const amountIn = getBigNumber(1);

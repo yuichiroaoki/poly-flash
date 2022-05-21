@@ -1,11 +1,11 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import * as IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
-import { DODOFlashloan, DODOFlashloan__factory } from "../typechain";
-import { dodoV2Pool, erc20Address } from "../constants/addresses";
+import * as IERC20 from "../../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
+import { DODOFlashloan, DODOFlashloan__factory } from "../../typechain";
+import { dodoV2Pool, erc20Address } from "../../constants/addresses";
 import { Contract } from "@ethersproject/contracts";
-import { getBigNumber } from "../utils";
+import { getBigNumber } from "../../utils";
 
 describe("dodo flashloan on polygon", () => {
   let Sample: DODOFlashloan;
