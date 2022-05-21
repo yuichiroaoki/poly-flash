@@ -1,6 +1,7 @@
 # Poly-Flash
 
-![test](https://github.com/yuichiroaoki/poly-flash/actions/workflows/test.yaml/badge.svg)
+![test](https://github.com/yuichiroaoki/poly-flash/actions/workflows/polygon.yaml/badge.svg)
+![test](https://github.com/yuichiroaoki/poly-flash/actions/workflows/bsc.yaml/badge.svg)
 
 An open source flashloan smart contract on polygon network
 
@@ -76,4 +77,3 @@ It costs about 0.2 MATIC to deploy `Flashloan` contract.
 ## Example Contract
 
 https://polygonscan.com/address/0xb6c4448386c4ecf4e5eab057351f8a6a8a465a0d
-

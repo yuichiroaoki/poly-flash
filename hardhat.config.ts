@@ -28,7 +28,7 @@ const configForTest = {
   networks: {
     hardhat: {
       forking: {
-        url: process.env.ALCHEMY_POLYGON_RPC_URL,
+        url: process.env.JSON_RPC_URL,
       },
     },
   },
@@ -63,8 +63,11 @@ const configLocal = {
   networks: {
     hardhat: {
       forking: {
+        // polygon
         url: process.env.ALCHEMY_POLYGON_RPC_URL,
         blockNumber: 28583600,
+
+        // bsc
         // url: process.env.BSC_RPC_URL,
         // blockNumber: 17988430,
       },

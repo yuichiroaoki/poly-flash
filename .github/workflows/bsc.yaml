@@ -1,15 +1,15 @@
-name: Test
+name: BSC
 on:
   push:
     branches: [main]
     paths:
       - "contracts/**"
-      - "test/**"
+      - "test/bsc/**"
   pull_request:
     branches: [main]
     paths:
       - "contracts/**"
-      - "test/**"
+      - "test/bsc/**"
 
 jobs:
   build:
@@ -28,7 +28,7 @@ jobs:
       - run: yarn install
       - run: yarn compile
         env:
-          ALCHEMY_POLYGON_RPC_URL: ${{ secrets.ALCHEMY_POLYGON_RPC_URL }}
-      - run: yarn test
+          JSON_RPC_URL: ${{ secrets.BSC_RPC_URL }}
+      - run: yarn test test/bsc/*.ts
         env:
-          ALCHEMY_POLYGON_RPC_URL: ${{ secrets.ALCHEMY_POLYGON_RPC_URL }}
+          JSON_RPC_URL: ${{ secrets.BSC_RPC_URL }}
