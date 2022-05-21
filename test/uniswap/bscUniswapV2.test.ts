@@ -1,11 +1,11 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { ERC20Mock, UniswapFork, UniswapFork__factory } from "../typechain";
-import { BSC_WHALE, bscTokens, uniswapRouter } from "../constants/bsc";
-import { getErc20Balance, impersonateFundErc20 } from "../utils/token";
-import { getPriceOnUniV2 } from "../utils/v2/getPrice";
-import { getBigNumber, getERC20ContractFromAddress } from "../utils";
+import { ERC20Mock, UniswapFork, UniswapFork__factory } from "../../typechain";
+import { BSC_WHALE, bscTokens, uniswapRouter } from "../../constants/bsc";
+import { getErc20Balance, impersonateFundErc20 } from "../../utils/token";
+import { getPriceOnUniV2 } from "../../utils/v2/getPrice";
+import { getBigNumber, getERC20ContractFromAddress } from "../../utils";
 
 describe("Swap on uniswap fork on bsc", () => {
   let Fork: UniswapFork;
