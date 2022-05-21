@@ -203,32 +203,5 @@ describe("Flashloan with 1inch routes", () => {
           .be.true;
       }
     });
-
-    it("should execute uniswapV3 flashloan with multiple routes.", async () => {
-      const [firstRoutes, secondRoutes] = await oneinchRoutes(
-        ERC20Token.USDC,
-        ERC20Token.WETH,
-        1000
-      );
-      if (firstRoutes && secondRoutes) {
-        await expect(
-          Flashloan.dodoFlashLoan(
-            {
-              flashLoanPool: dodoV2Pool.WETH_USDC,
-              loanAmount: getBigNumber(1000, 6),
-              firstRoutes: firstRoutes,
-              secondRoutes: secondRoutes,
-            },
-            { gasLimit: 1000000 }
-          )
-        )
-          .emit(Flashloan, "SwapFinished")
-          .emit(Flashloan, "SentProfit");
-        const balance = await USDC.balanceOf(owner.address);
-        expect(balance.gt(getBigNumber(0))).to.be.true;
-        expect((await DAI.balanceOf(Flashloan.address)).eq(getBigNumber(0))).to
-          .be.true;
-      }
-    });
   });
 });
