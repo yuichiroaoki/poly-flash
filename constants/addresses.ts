@@ -6,7 +6,7 @@ export const USDC_WHALE = "0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8";
 export const dex1inch = "0x11111112542D85B3EF69AE05771c2dCCff4fAa26";
 export const BurnAddress = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
-type ERC20Map = { [erc20: string]: string };
+export type ERC20Map = { [erc20: string]: string };
 
 export const erc20Address: ERC20Map = {
   DAI: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
@@ -16,17 +16,16 @@ export const erc20Address: ERC20Map = {
   WMATIC: "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
 };
 
-type PoolMap = { [pair: string]: string };
+export type PoolMap = { [pair: string]: string };
 
 export const dodoV2Pool: PoolMap = {
   WETH_USDC: "0x5333Eb1E32522F1893B7C9feA3c263807A02d561",
   WMATIC_USDC: "0x10Dd6d8A29D489BEDE472CC1b22dc695c144c5c7",
   WMATIC_WETH: "0x80db8525F61e8C3688DBb7fFa9ABcae05Ae8a90A",
-  USDC_USDT: "0xA0020444b98f67B77a3d6dE6E66aF11c87da086e",
   WBTC_USDC: "0xe020008465cD72301A18b97d33D73bF44858A4b7",
 };
 
-type RouterMap = { [protocol: string]: string };
+export type RouterMap = { [protocol: string]: string };
 
 export const uniswapRouter: RouterMap = {
   POLYGON_UNISWAP_V3: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
