@@ -1,16 +1,20 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { dodoV2Pool, erc20Address, USDC_WHALE } from "../constants/addresses";
-import { ERC20Token } from "../constants/token";
-import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
+import {
+  dodoV2Pool,
+  erc20Address,
+  USDC_WHALE,
+} from "../../constants/addresses";
+import { ERC20Token } from "../../constants/token";
+import { ERC20Mock, Flashloan, Flashloan__factory } from "../../typechain";
 import {
   deployContractFromName,
   getBigNumber,
   getERC20ContractFromAddress,
-} from "../utils";
-import { impersonateFundErc20 } from "../utils/token";
-import { oneinchRoutes } from "../utils/1inch";
+} from "../../utils";
+import { impersonateFundErc20 } from "../../utils/token";
+import { oneinchRoutes } from "../../utils/1inch";
 
 describe("Flashloan with 1inch routes", () => {
   let Flashloan: Flashloan;

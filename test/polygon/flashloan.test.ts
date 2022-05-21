@@ -7,16 +7,16 @@ import {
   DODOV2Proxy,
   erc20Address,
   USDC_WHALE,
-} from "../constants/addresses";
-import { ERC20Token } from "../constants/token";
-import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
+} from "../../constants/addresses";
+import { ERC20Token } from "../../constants/token";
+import { ERC20Mock, Flashloan, Flashloan__factory } from "../../typechain";
 import {
   deployContractFromName,
   findRouterFromProtocol,
   getBigNumber,
   getERC20ContractFromAddress,
-} from "../utils";
-import { impersonateFundErc20 } from "../utils/token";
+} from "../../utils";
+import { impersonateFundErc20 } from "../../utils/token";
 
 describe("Flashloan", () => {
   let Flashloan: Flashloan;

@@ -1,11 +1,11 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import * as IERC20 from "../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
-import { DODOFlashloan, DODOFlashloan__factory } from "../typechain";
-import { bscTokens, dodoV2Pool } from "../constants/bsc";
+import * as IERC20 from "../../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
+import { DODOFlashloan, DODOFlashloan__factory } from "../../typechain";
+import { bscTokens, dodoV2Pool } from "../../constants/bsc";
 import { Contract } from "@ethersproject/contracts";
-import { getBigNumber } from "../utils";
+import { getBigNumber } from "../../utils";
 
 describe("dodo flashloan on bsc", () => {
   let Sample: DODOFlashloan;
@@ -38,7 +38,7 @@ describe("dodo flashloan on bsc", () => {
   });
 
   describe("DODO flashloan", async () => {
-    xit("should execute flashloan", async () => {
+    it("should execute flashloan", async () => {
       // borrowing 1 BUSD from DODOs ETH/BUSD pool
       await expect(
         Sample.dodoFlashLoan(

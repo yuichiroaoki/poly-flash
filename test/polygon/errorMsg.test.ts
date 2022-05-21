@@ -1,14 +1,14 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { dodoV2Pool, erc20Address } from "../constants/addresses";
-import { ERC20Mock, Flashloan, Flashloan__factory } from "../typechain";
+import { dodoV2Pool, erc20Address } from "../../constants/addresses";
+import { ERC20Mock, Flashloan, Flashloan__factory } from "../../typechain";
 import {
   deployContractFromName,
   findRouterFromProtocol,
   getBigNumber,
   getERC20ContractFromAddress,
-} from "../utils";
+} from "../../utils";
 
 describe("Flashloan Error Message", () => {
   let Flashloan: Flashloan;
