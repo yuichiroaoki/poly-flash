@@ -61,7 +61,7 @@ yarn compile
 Run the following command.
 
 ```bash
-yarn test test/flashloan.test.ts
+yarn test test/polygon/flashloan.test.ts
 ```
 
 ## Deploy
