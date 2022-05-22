@@ -53,7 +53,33 @@ describe("Swap on uniswap fork on bsc", () => {
       );
       await expect(
         Fork.uniswapFork(
-          uniswapRouter.BSC_PANCAKESWAP,
+          routerAddress,
+          tokenIn,
+          amountIn,
+          1,
+          [tokenIn, tokenOut],
+          Fork.address
+        )
+      ).not.to.reverted;
+      expect((await DAI.balanceOf(Fork.address)).eq(expected)).to.be.true;
+    });
+  });
+
+  describe("sushiswap", async () => {
+    it("should execute dai -> usdc swap", async () => {
+      const tokenIn = bscTokens.USDC;
+      const tokenOut = bscTokens.DAI;
+      const amountIn = getBigNumber(1);
+      const routerAddress = uniswapRouter.BSC_SUSHISWAP;
+      const expected = await getPriceOnUniV2(
+        tokenIn,
+        tokenOut,
+        amountIn,
+        routerAddress
+      );
+      await expect(
+        Fork.uniswapFork(
+          routerAddress,
           tokenIn,
           amountIn,
           1,
