@@ -39,18 +39,18 @@ describe("dodo flashloan on bsc", () => {
 
   describe("DODO flashloan", async () => {
     it("should execute flashloan", async () => {
-      // borrowing 1 BUSD from DODOs ETH/BUSD pool
+      // borrowing 1000 BUSD from DODOs ETH/BUSD pool
       await expect(
         Sample.dodoFlashLoan(
           dodoV2Pool.ETH_BUSD,
-          getBigNumber(1),
+          getBigNumber(1000),
           bscTokens.BUSD
         )
       )
         .emit(Sample, "checkBorrowedAmount")
-        .withArgs(bscTokens.BUSD, getBigNumber(1))
+        .withArgs(bscTokens.BUSD, getBigNumber(1000))
         .emit(Sample, "payBackLoan")
-        .withArgs(bscTokens.BUSD, getBigNumber(1));
+        .withArgs(bscTokens.BUSD, getBigNumber(1000));
     });
   });
 });
