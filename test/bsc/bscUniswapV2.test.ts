@@ -15,11 +15,13 @@ describe("Swap on uniswap fork on bsc", () => {
   let addrs: SignerWithAddress[];
   let DAI: ERC20Mock;
   let USDC: ERC20Mock;
+  let BUSD: ERC20Mock;
 
   let fixture: any;
 
   before(async () => {
     USDC = await getERC20ContractFromAddress(bscTokens.USDC);
+    BUSD = await getERC20ContractFromAddress(bscTokens.BUSD);
     DAI = await getERC20ContractFromAddress(bscTokens.DAI);
 
     fixture = async () => {
@@ -53,7 +55,7 @@ describe("Swap on uniswap fork on bsc", () => {
       );
       await expect(
         Fork.uniswapFork(
-          uniswapRouter.BSC_PANCAKESWAP,
+          routerAddress,
           tokenIn,
           amountIn,
           1,
@@ -62,6 +64,56 @@ describe("Swap on uniswap fork on bsc", () => {
         )
       ).not.to.reverted;
       expect((await DAI.balanceOf(Fork.address)).eq(expected)).to.be.true;
+    });
+  });
+
+  describe("sushiswap", async () => {
+    it("should execute USDC -> DAI swap", async () => {
+      const tokenIn = bscTokens.USDC;
+      const tokenOut = bscTokens.DAI;
+      const amountIn = getBigNumber(1);
+      const routerAddress = uniswapRouter.BSC_SUSHISWAP;
+      const expected = await getPriceOnUniV2(
+        tokenIn,
+        tokenOut,
+        amountIn,
+        routerAddress
+      );
+      await expect(
+        Fork.uniswapFork(
+          routerAddress,
+          tokenIn,
+          amountIn,
+          1,
+          [tokenIn, tokenOut],
+          Fork.address
+        )
+      ).not.to.reverted;
+      expect((await DAI.balanceOf(Fork.address)).eq(expected)).to.be.true;
+    });
+
+    it("should execute USDC -> BUSD swap", async () => {
+      const tokenIn = bscTokens.USDC;
+      const tokenOut = bscTokens.BUSD;
+      const amountIn = getBigNumber(1);
+      const routerAddress = uniswapRouter.BSC_SUSHISWAP;
+      const expected = await getPriceOnUniV2(
+        tokenIn,
+        tokenOut,
+        amountIn,
+        routerAddress
+      );
+      await expect(
+        Fork.uniswapFork(
+          routerAddress,
+          tokenIn,
+          amountIn,
+          1,
+          [tokenIn, tokenOut],
+          Fork.address
+        )
+      ).not.to.reverted;
+      expect((await BUSD.balanceOf(Fork.address)).eq(expected)).to.be.true;
     });
   });
 });
