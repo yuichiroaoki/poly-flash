@@ -1,6 +1,6 @@
 import { ERC20Map, PoolMap, RouterMap } from "./addresses";
 
-export const BSC_WHALE = "0x5c9F6cA2e81EaEad3D9aFf26efca7Fa307403297";
+export const BSC_WHALE = "0xB224228b0Fe71ceBf95EE25339166CD626759b52";
 
 export const bscTokens: ERC20Map = {
   DAI: "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
