@@ -2,14 +2,9 @@
 pragma solidity ^0.8.0;
 
 interface IFlashloan {
-    struct Swap {
-        uint8 protocol;
-        uint16 part;
-        bytes data;
-    }
-
     struct Hop {
-        Swap[] swaps;
+        uint8 protocol;
+        bytes data;
         address[] path;
     }
 
@@ -21,15 +16,13 @@ interface IFlashloan {
     struct FlashParams {
         address flashLoanPool;
         uint256 loanAmount;
-        Route[] firstRoutes;
-        Route[] secondRoutes;
+        Route[] routes;
     }
 
     struct FlashCallbackData {
         address me;
         address flashLoanPool;
         uint256 loanAmount;
-        Route[] firstRoutes;
-        Route[] secondRoutes;
+        Route[] routes;
     }
 }

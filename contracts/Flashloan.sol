@@ -35,11 +35,10 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
                 me: msg.sender,
                 flashLoanPool: params.flashLoanPool,
                 loanAmount: params.loanAmount,
-                firstRoutes: params.firstRoutes,
-                secondRoutes: params.secondRoutes
+                routes: params.routes
             })
         );
-        address loanToken = RouteUtils.getInitialToken(params.firstRoutes[0]);
+        address loanToken = RouteUtils.getInitialToken(params.routes[0]);
         IDODO(params.flashLoanPool).flashLoan(
             IDODO(params.flashLoanPool)._BASE_TOKEN_() == loanToken
                 ? params.loanAmount
@@ -63,17 +62,14 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
             (FlashCallbackData)
         );
 
-        address loanToken = RouteUtils.getInitialToken(decoded.firstRoutes[0]);
-        address toToken = RouteUtils.getInitialToken(decoded.secondRoutes[0]);
+        address loanToken = RouteUtils.getInitialToken(decoded.routes[0]);
 
         require(
             IERC20(loanToken).balanceOf(address(this)) >= decoded.loanAmount,
             "Failed to borrow loan token"
         );
 
-        routeLoop(decoded.firstRoutes, decoded.loanAmount);
-        uint256 toTokenAmount = IERC20(toToken).balanceOf(address(this));
-        routeLoop(decoded.secondRoutes, toTokenAmount);
+        routeLoop(decoded.routes, decoded.loanAmount);
 
         emit SwapFinished(
             loanToken,
@@ -106,37 +102,20 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
     function hopLoop(Route memory route, uint256 totalAmount) internal {
         uint256 amountIn = totalAmount;
         for (uint256 i = 0; i < route.hops.length; i++) {
-            amountIn = swapLoop(route.hops[i], amountIn);
+            amountIn = pickProtocol(route.hops[i], amountIn);
         }
     }
 
-    function swapLoop(Hop memory hop, uint256 totalAmount)
+    function pickProtocol(Hop memory hop, uint256 amountIn)
         internal
-        checkTotalSwapPart(hop.swaps)
-        returns (uint256)
+        returns (uint256 amountOut)
     {
-        uint256 amountOut = 0;
-        for (uint256 i = 0; i < hop.swaps.length; i++) {
-            uint256 amountIn = Part.partToAmountIn(
-                hop.swaps[i].part,
-                totalAmount
-            );
-            amountOut += pickProtocol(hop.swaps[i], amountIn, hop.path);
-        }
-        return amountOut;
-    }
-
-    function pickProtocol(
-        Swap memory swap,
-        uint256 amountIn,
-        address[] memory path
-    ) internal checkRouteProtocol(swap) returns (uint256 amountOut) {
-        if (swap.protocol == 0) {
-            amountOut = uniswapV3(swap.data, amountIn, path);
-        } else if (swap.protocol < 8) {
-            amountOut = uniswapV2(swap.data, amountIn, path);
+        if (hop.protocol == 0) {
+            amountOut = uniswapV3(hop.data, amountIn, hop.path);
+        } else if (hop.protocol < 8) {
+            amountOut = uniswapV2(hop.data, amountIn, hop.path);
         } else {
-            amountOut = dodoV2Swap(swap.data, amountIn, path);
+            amountOut = dodoV2Swap(hop.data, amountIn, hop.path);
         }
     }
 

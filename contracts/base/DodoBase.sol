@@ -44,10 +44,12 @@ contract DodoBase is IFlashloan {
     ) internal virtual {}
 
     modifier checkParams(FlashParams memory params) {
-        address loanToken = RouteUtils.getInitialToken(params.firstRoutes[0]);
-        bool loanEqBase = loanToken == IDODO(params.flashLoanPool)._BASE_TOKEN_();
-        bool loanEqQuote = loanToken == IDODO(params.flashLoanPool)._QUOTE_TOKEN_();
+        address loanToken = RouteUtils.getInitialToken(params.routes[0]);
+        bool loanEqBase = loanToken ==
+            IDODO(params.flashLoanPool)._BASE_TOKEN_();
+        bool loanEqQuote = loanToken ==
+            IDODO(params.flashLoanPool)._QUOTE_TOKEN_();
         require(loanEqBase || loanEqQuote, "Wrong flashloan pool address");
-		_;
-	}
+        _;
+    }
 }
