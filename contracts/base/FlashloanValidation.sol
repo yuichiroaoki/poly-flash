@@ -14,18 +14,4 @@ abstract contract FlashloanValidation {
         require(totalPart == 10000, "Route part error");
         _;
     }
-
-    modifier checkTotalSwapPart(IFlashloan.Swap[] memory swaps) {
-        uint16 totalPart = 0;
-        for (uint256 i = 0; i < uint256(swaps.length); i++) {
-            totalPart += swaps[i].part;
-        }
-        require(totalPart == 10000, "Swap part error");
-        _;
-    }
-
-    modifier checkRouteProtocol(IFlashloan.Swap memory swap) {
-        require(MAX_PROTOCOL >= swap.protocol, "Wrong protocol");
-        _;
-    }
 }
