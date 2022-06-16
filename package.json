@@ -11,6 +11,7 @@
     "compile": "npx hardhat compile",
     "account": "npx hardhat accounts",
     "balance": "npx hardhat balance --account",
+    "liquidations": "npx hardhat run scripts/liquidations.ts",
     "block-number": "npx hardhat block-number",
     "deploy": "npx hardhat run scripts/deploy.ts",
     "test": "npx hardhat test",
