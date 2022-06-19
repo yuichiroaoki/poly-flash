@@ -190,6 +190,6 @@ contract Flashloan is IFlashloan, DodoBase, FlashloanValidation, Withdraw {
         address to,
         uint256 amountIn
     ) internal {
-        require(IERC20(token).approve(to, amountIn), "approve failed.");
+        require(IERC20(token).approve(to, amountIn), "approve failed");
     }
 }

@@ -59,6 +59,7 @@ describe("Aave flashloan on polygon", () => {
       await expect(Flashloan.aaveFlashloan(ERC20Token.USDC.address, loanAmount))
         .to.not.reverted;
 
+      // check USDC balance of the flashloan contract after flashloan
       await getErc20Balance(USDC, Flashloan.address, "USDC", 6);
     });
   });

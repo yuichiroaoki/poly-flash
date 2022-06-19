@@ -40,6 +40,7 @@ contract AaveFlashloan is FlashLoanSimpleReceiverBase {
         );
         console.log("borrowed amount:", amount);
 
+        // pay back the loan amount and the premium (flashloan fee)
         uint256 amountToReturn = amount.add(premium);
         require(
             IERC20(asset).balanceOf(address(this)) >= amountToReturn,
@@ -57,6 +58,6 @@ contract AaveFlashloan is FlashLoanSimpleReceiverBase {
         address to,
         uint256 amountIn
     ) internal {
-        require(IERC20(token).approve(to, amountIn), "af");
+        require(IERC20(token).approve(to, amountIn), "approve failed");
     }
 }
