@@ -13,6 +13,7 @@ import "./tasks/block-number";
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
+ * config for github actions only
  */
 const configForTest = {
   solidity: {
@@ -85,4 +86,4 @@ const configLocal = {
   },
 };
 
-module.exports = process.env.PRIVATE_KEY ? configLocal : configForTest;
+module.exports = process.env.CI ? configForTest : configLocal;
