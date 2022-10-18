@@ -25,11 +25,9 @@ contract BalancerFlashLoan is IFlashLoanRecipient {
         for (uint256 i = 0; i < tokens.length; ++i) {
             IERC20 token = tokens[i];
             uint256 amount = amounts[i];
+            console.log("borrowed amount:", amount);
             uint256 feeAmount = feeAmounts[i];
-            console.log("feeAmount", feeAmount);
-
-            uint256 balance = token.balanceOf(address(this));
-            console.log("balance", balance);
+            console.log("flashloan fee: ", feeAmount);
 
             // Return loan
             token.transfer(vault, amount);
